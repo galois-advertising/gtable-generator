@@ -1,2 +1,4 @@
 build
 *.pyc
+*.ddl.xml
+output

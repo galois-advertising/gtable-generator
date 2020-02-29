@@ -1,6 +1,6 @@
 // solopointer1202@gmail.com
 // 20200109
-package gqlgenerator
+package main
 
 import (
 	"fmt"
@@ -9,6 +9,14 @@ import (
 	"regexp"
 	"strings"
 )
+
+func DirExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return info.IsDir()
+}
 
 func FileExists(filename string) bool {
 	info, err := os.Stat(filename)
