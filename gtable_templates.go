@@ -46,7 +46,7 @@ func exists(name string) bool {
 
 func (gt *Gtable_templates) generate_datatable(out_path string, data interface{}) {
 	dt := data.(Datatable)
-	h_file, err := os.Create(fmt.Sprintf("%s/%s.h", out_path, dt.Name))
+	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, dt.Name))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func (gt *Gtable_templates) generate_datatable(out_path string, data interface{}
 	if err := tmpl.Execute(h_file, data); err != nil {
 		panic(err.Error())
 	}
-	cpp_file, err := os.Create(fmt.Sprintf("%s/%s.cpp", out_path, dt.Name))
+	cpp_file, err := os.Create(fmt.Sprintf("%s/src/%s.cpp", out_path, dt.Name))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -67,7 +67,7 @@ func (gt *Gtable_templates) generate_datatable(out_path string, data interface{}
 }
 
 func (gt *Gtable_templates) generate_datasource_databus(out_path string, ds *Datasource) {
-	h_file, err := os.Create(fmt.Sprintf("%s/%s.h", out_path, ds.Name))
+	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, ds.Name))
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -80,7 +80,7 @@ func (gt *Gtable_templates) generate_datasource_databus(out_path string, ds *Dat
 	} else {
 		panic(fmt.Sprintf("Cannot find .h template for Datasource::databus"))
 	}
-	cpp_file, err := os.Create(fmt.Sprintf("%s/%s.cpp", out_path, ds.Name))
+	cpp_file, err := os.Create(fmt.Sprintf("%s/src/%s.cpp", out_path, ds.Name))
 	if err != nil {
 		log.Fatal(err)
 	}

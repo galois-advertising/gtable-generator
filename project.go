@@ -58,14 +58,13 @@ func (d *Project) build_dataview() error {
 	return nil
 }
 
-func (d *Project) Init() error {
+func (d *Project) Init() {
 	d.Datasources = []Datasource{}
 	d.Dataviews = []Dataview{}
 	d.Dataupdators = []Dataupdator{}
 	d.Datatables = []Datatable{}
 	d.Indexupdators = []Indexupdator{}
 	d.Indextalbes = []Indextable{}
-	return nil
 }
 
 func (d *Project) LoadDDL(ddl_path string) error {
