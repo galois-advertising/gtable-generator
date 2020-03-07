@@ -53,7 +53,7 @@ public:
 
     bool reload(uint32_t token_num) {
         if (loader != nullptr) {
-            return loader->load_inc();
+            //return loader->load_inc();
         } else {
             FATAL("The datasource [%s] is uninitialized",
                 this->name().c_str());
@@ -63,7 +63,8 @@ public:
 
     int add_record(const galois::gformat::pack_header_t& header,
             const char *data, size_t data_len) {
-        return loader->load_inc(header, data, (uint32_t)data_len);
+        //return loader->load_inc(header, data, (uint32_t)data_len);
+        return false;
     }
 private:
     std::shared_ptr<databus_loader_t> loader;

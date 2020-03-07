@@ -8,14 +8,12 @@ import (
 
 func TestDatasource(t *testing.T) {
 	blob := `
-  <datasource>
+	<datasource>
     <name>gbus</name>
-    <properties>
-      <type>databus</type>
-      <protourl>ssh://git@github.com/galois-advertising/common/master/dbschema/freyja/databus_event.proto</protourl>
-    </properties>
+    <property name="type">databus</property>
+    <property name="protourl">ssh://git@github.com/galois-advertising/common/master/dbschema/freyja/databus_event.proto</property>
     <notations/>
-  </datasource>
+  </datasource> 
 	`
 	var d Datasource
 	if err := xml.Unmarshal([]byte(blob), &d); err != nil {

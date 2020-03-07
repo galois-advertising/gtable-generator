@@ -138,7 +138,10 @@ func (d *Project) Generate(templates_path string, out_path string) error {
 	var tmps Gtable_templates
 	if err := tmps.Init(templates_path); err == nil {
 		for _, ds := range d.Datasources {
-			tmps.Generate(out_path, ds)
+			tmps.Generate(out_path, &ds)
+		}
+		for _, dv := range d.Dataviews {
+			tmps.Generate(out_path, &dv)
 		}
 	}
 	return nil

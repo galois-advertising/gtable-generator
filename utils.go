@@ -4,11 +4,38 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"regexp"
 	"strings"
 )
+
+func Cp(src, dst string) error {
+	var err error
+	var srcfd *os.File
+	var dstfd *os.File
+	var srcinfo os.FileInfo
+
+	log.Printf("cp [%s] to [%s]", src, dst)
+	if srcfd, err = os.Open(src); err != nil {
+		return err
+	}
+	defer srcfd.Close()
+
+	if dstfd, err = os.Create(dst); err != nil {
+		return err
+	}
+	defer dstfd.Close()
+
+	if _, err = io.Copy(dstfd, srcfd); err != nil {
+		return err
+	}
+	if srcinfo, err = os.Stat(src); err != nil {
+		return err
+	}
+	return os.Chmod(dst, srcinfo.Mode())
+}
 
 func DirExists(filename string) bool {
 	info, err := os.Stat(filename)

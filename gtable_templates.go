@@ -44,15 +44,28 @@ func exists(name string) bool {
 	return true
 }
 
-func (gt *Gtable_templates) generate_datatable(out_path string, data interface{}) {
-	dt := data.(Datatable)
+func (gt *Gtable_templates) generate_dataview(out_path string, dv *Dataview) {
+	if udf, err := dv.Get_udf(); err == nil {
+		h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h.example", out_path, udf))
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer h_file.Close()
+		tmpl := gt.tmpls["dataview_udf_example.t"]
+		if err := tmpl.Execute(h_file, dv); err != nil {
+			panic(err.Error())
+		}
+	}
+}
+
+func (gt *Gtable_templates) generate_datatable(out_path string, dt *Datatable) {
 	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, dt.Name))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer h_file.Close()
 	tmpl := gt.tmpls["datatable_h.t"]
-	if err := tmpl.Execute(h_file, data); err != nil {
+	if err := tmpl.Execute(h_file, dt); err != nil {
 		panic(err.Error())
 	}
 	cpp_file, err := os.Create(fmt.Sprintf("%s/src/%s.cpp", out_path, dt.Name))
@@ -61,12 +74,13 @@ func (gt *Gtable_templates) generate_datatable(out_path string, data interface{}
 	}
 	defer cpp_file.Close()
 	tmpl = gt.tmpls["datatable_cpp.t"]
-	if err := tmpl.Execute(cpp_file, data); err != nil {
+	if err := tmpl.Execute(cpp_file, dt); err != nil {
 		panic(err.Error())
 	}
 }
 
 func (gt *Gtable_templates) generate_datasource_databus(out_path string, ds *Datasource) {
+	log.Printf("Processing %s", ds.Name)
 	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, ds.Name))
 	if err != nil {
 		log.Fatal(err)
@@ -94,12 +108,15 @@ func (gt *Gtable_templates) generate_datasource_databus(out_path string, ds *Dat
 	}
 }
 
-func (gt *Gtable_templates) generate_datasource(out_path string, data interface{}) {
-	ds := data.(Datasource)
-	switch ds.Type {
-	case "databus":
-		gt.generate_datasource_databus(out_path, &ds)
-	default:
+func (gt *Gtable_templates) generate_datasource(out_path string, ds *Datasource) {
+	dtype, err := ds.Get_type()
+	log.Printf(dtype)
+	if err == nil {
+		switch dtype {
+		case "databus":
+			gt.generate_datasource_databus(out_path, ds)
+		default:
+		}
 	}
 }
 
@@ -107,11 +124,14 @@ func (gt *Gtable_templates) Generate(out_path string, data interface{}) {
 	if !exists(out_path) {
 		panic(fmt.Sprintf("[%s] does not exists.", out_path))
 	}
+	log.Printf("Start to generate")
 	switch data.(type) {
-	case Datatable:
-		gt.generate_datatable(out_path, data)
-	case Datasource:
-		gt.generate_datasource(out_path, data)
+	case *Datatable:
+		gt.generate_datatable(out_path, data.(*Datatable))
+	case *Dataview:
+		gt.generate_dataview(out_path, data.(*Dataview))
+	case *Datasource:
+		gt.generate_datasource(out_path, data.(*Datasource))
 	default:
 		panic(fmt.Sprintf("Unknow type"))
 	}

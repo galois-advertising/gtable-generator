@@ -2,21 +2,45 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strings"
 )
 
 type Dataview struct {
-	Name               string   `xml:"name"`
-	Channel            string   `xml:"channel"`
-	Columns            []Column `xml:"columns_node>column_node"`
-	Notations          []string `xml:"notations>notation"`
+	Name               string     `xml:"name"`
+	Channel            string     `xml:"channel"`
+	Columns            []Column   `xml:"columns_node>column_node"`
+	Notations          []string   `xml:"notations>notation"`
+	Properties         []Property `xml:"property"`
 	Namespace          string
 	Handler            string
 	Cppcode            string
 	Datasource_name    string
 	Datasource_channel string
+}
+
+func (d *Dataview) Test() string {
+	return "TestTestTest"
+}
+
+func (d *Dataview) Has_udf() bool {
+	for _, v := range d.Properties {
+		if v.Name == "udf" {
+			return true
+		}
+	}
+	return false
+}
+
+func (d *Dataview) Get_udf() (string, error) {
+	for _, v := range d.Properties {
+		if v.Name == "udf" {
+			return v.Value, nil
+		}
+	}
+	return "", errors.New(fmt.Sprintf("Could not find udf of %s", d.Name))
 }
 
 func (d *Dataview) SetNamespace(_ns string) {

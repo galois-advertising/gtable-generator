@@ -3,6 +3,8 @@ package main
 
 import (
 	"encoding/xml"
+	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -23,6 +25,18 @@ type KindAttr struct {
 type Constrain struct {
 	Prop string `xml:"prop,attr"`
 	Name string `xml:",chardata"`
+}
+
+func (c *Column) Get_from() (string, error) {
+	if c.Colume_from != "derivative" {
+		return "", errors.New(fmt.Sprintf("%s is not a derivative column", c.Column_name))
+	}
+	for _, v := range c.Constrains_list {
+		if v.Name == "from" {
+			return v.Prop, nil
+		}
+	}
+	return "", errors.New(fmt.Sprintf("Could not find [from] of %s", c.Column_name))
 }
 
 func (c *Column) UpperName() string {

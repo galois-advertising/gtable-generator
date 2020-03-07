@@ -71,21 +71,42 @@ func main() {
 		return
 	}
 	p.Stat()
-	log.Println(path.Join(output_path, "gtable"))
 	if err := ensure_dir(path.Join(output_path, "gtable")); err != nil {
 		log.Fatalf("Mkdir [%s] failed for %s", "gtable", err.Error())
 		return
 	}
+	os.Chmod(path.Join(output_path, "gtable"), os.ModePerm)
 	if err := ensure_dir(path.Join(output_path, "include")); err != nil {
 		log.Fatalf("Mkdir [%s] failed for %s", "include", err.Error())
 		return
 	}
+	os.Chmod(path.Join(output_path, "include"), os.ModePerm)
 	if err := ensure_dir(path.Join(output_path, "src")); err != nil {
 		log.Fatalf("Mkdir [%s] failed for %s", "src", err.Error())
 		return
 	}
+	os.Chmod(path.Join(output_path, "src"), os.ModePerm)
+
 	if err := p.Generate(template_path, output_path); err != nil {
 		return
 	}
+
+	var gtable_include string
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	gtable_include = path.Join(filepath.Dir(ex), "gtable-generator-include")
+	filepath.Walk(gtable_include,
+		func(gtable_file string, f os.FileInfo, err error) error {
+			if f == nil {
+				return err
+			}
+			log.Printf(gtable_file)
+			if !f.IsDir() {
+				Cp(gtable_file, path.Join(output_path, "gtable", filepath.Base(gtable_file)))
+			}
+			return nil
+		})
 	log.Println("Generate succeed.")
 }

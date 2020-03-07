@@ -26,20 +26,14 @@ class {{.Datasource_name -}}_{{- .Datasource_channel -}}_callbacks : public
     {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits
 > {
 public:
-    static int insert({{.Handler -}}& env, const galois::gformat::pack_header_t& header,
-        const typename {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits::update_t& data, uint32_t data_type) {
-        return 0;
-    };
+    static int insert({{.Handler -}}* env, const galois::gformat::pack_header_t& header,
+        const typename {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits::update_t& data);
 
-    static int del({{.Handler -}}& env, const galois::gformat::pack_header_t& header,
-        const typename {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits::delete_t& data, uint32_t data_type) {
-        return 0;
-    };
+    static int del({{.Handler -}}* env, const galois::gformat::pack_header_t& header,
+        const typename {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits::delete_t& data);
 
-    static int update({{.Handler -}}& env, const galois::gformat::pack_header_t& header,
-        const typename {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits::update_t& data, uint32_t data_type) {
-        return 0;
-    };
+    static int update({{.Handler -}}* env, const galois::gformat::pack_header_t& header,
+        const typename {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits::update_t& data);
 };
 
 {{- end}}
