@@ -27,12 +27,5 @@ func (d *Indextable) SetCppcode(_cpp string) {
 
 func (d *Indextable) Setup() error {
 	d.Include_dataview_headers = []string{"common.h", "b.h"}
-	d.Namespace = "galois::gtable"
-	//for _, name := range strings.Split(d.Primary_key.Name, ",") {
-	//	reg := regexp.MustCompile("\\s+")
-	//	reg.ReplaceAllString(name, "")
-	//	d.Primary_key.NameList = append(d.Primary_key.NameList, name)
-	//}
-	//log.Println(d.PrimarykeyList())
 	return nil
 }

@@ -18,7 +18,9 @@ type Project struct {
 	Dataupdators  []Dataupdator
 	Datatables    []Datatable
 	Indexupdators []Indexupdator
-	Indextalbes   []Indextable
+	Indextables   []Indextable
+	Namespace     string
+	Handler       string
 }
 
 func (d *Project) Stat() {
@@ -27,7 +29,7 @@ func (d *Project) Stat() {
 	log.Printf("Dataupdators\t\tlen:%d\n", len(d.Dataupdators))
 	log.Printf("Datatables\t\tlen:%d\n", len(d.Datatables))
 	log.Printf("Indexupdators\t\tlen:%d\n", len(d.Indexupdators))
-	log.Printf("Indextalbes\t\tlen:%d\n", len(d.Indextalbes))
+	log.Printf("Indextables\t\tlen:%d\n", len(d.Indextables))
 }
 
 func (d *Project) build_datasource() error {
@@ -55,6 +57,15 @@ func (d *Project) build_dataview() error {
 		_m[dv.Name] = uint32(idx)
 		log.Printf("Dataview:[%s]", dv.Name)
 	}
+	for idu, du := range d.Dataupdators {
+		if idv, ok := _m[du.From]; ok {
+			d.Dataviews[idv].Dataupdators =
+				append(d.Dataviews[idv].Dataupdators, &d.Dataupdators[idu])
+			log.Printf("link [%s] -> [%s]", du.Name, d.Dataviews[idv].Name)
+		} else {
+			log.Fatalf("dataupdator [%s]->[%s] : from not found", du.From, du.To)
+		}
+	}
 	return nil
 }
 
@@ -64,7 +75,67 @@ func (d *Project) Init() {
 	d.Dataupdators = []Dataupdator{}
 	d.Datatables = []Datatable{}
 	d.Indexupdators = []Indexupdator{}
-	d.Indextalbes = []Indextable{}
+	d.Indextables = []Indextable{}
+}
+
+func (d *Project) check_and_set_handler() error {
+	handler := make(map[string]bool)
+	for _, v := range d.Datasources {
+		handler[v.Handler] = true
+	}
+	for _, v := range d.Dataviews {
+		handler[v.Handler] = true
+	}
+	for _, v := range d.Datatables {
+		handler[v.Handler] = true
+	}
+	for _, v := range d.Dataupdators {
+		handler[v.Handler] = true
+	}
+	for _, v := range d.Indextables {
+		handler[v.Handler] = true
+	}
+	if len(handler) != 1 {
+		errs := fmt.Sprintf("Handler not unique:%v", handler)
+		log.Fatal(errs)
+		return errors.New(errs)
+	} else {
+		log.Printf("Handler is unique:%v", handler)
+		for k, _ := range handler {
+			d.Handler = k
+		}
+	}
+	return nil
+}
+
+func (d *Project) check_and_set_namespace() error {
+	namespace := make(map[string]bool)
+	for _, v := range d.Datasources {
+		namespace[v.Namespace] = true
+	}
+	for _, v := range d.Dataviews {
+		namespace[v.Namespace] = true
+	}
+	for _, v := range d.Datatables {
+		namespace[v.Namespace] = true
+	}
+	for _, v := range d.Dataupdators {
+		namespace[v.Namespace] = true
+	}
+	for _, v := range d.Indextables {
+		namespace[v.Namespace] = true
+	}
+	if len(namespace) != 1 {
+		errs := fmt.Sprintf("Namespace not unique:%v", namespace)
+		log.Fatal(errs)
+		return errors.New(errs)
+	} else {
+		log.Printf("Namespace is unique:%v", namespace)
+		for k, _ := range namespace {
+			d.Namespace = k
+		}
+	}
+	return nil
 }
 
 func (d *Project) LoadDDL(ddl_path string) error {
@@ -104,8 +175,8 @@ func (d *Project) LoadDDL(ddl_path string) error {
 					for _, dv := range ddl.Indexupdators {
 						d.Indexupdators = append(d.Indexupdators, dv)
 					}
-					for _, dv := range ddl.Indextalbes {
-						d.Indextalbes = append(d.Indextalbes, dv)
+					for _, dv := range ddl.Indextables {
+						d.Indextables = append(d.Indextables, dv)
 					}
 				}
 			}
@@ -121,6 +192,13 @@ func (d *Project) LoadDDL(ddl_path string) error {
 		log.Fatal(errs)
 		return errors.New(errs)
 	}
+	if err := d.check_and_set_namespace(); err != nil {
+		return err
+	}
+	if err := d.check_and_set_handler(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -144,5 +222,6 @@ func (d *Project) Generate(templates_path string, out_path string) error {
 			tmps.Generate(out_path, &dv)
 		}
 	}
+	tmps.generate_project(out_path, d)
 	return nil
 }

@@ -16,13 +16,11 @@ class {{.Handler}};
 
 {{- range .Dataviews}}
 
-typedef {{.Handler -}}* {{.Datasource_name -}}_{{- .Datasource_channel -}}_parse_env_t;
-typedef {{.Handler -}}* {{.Datasource_name -}}_{{- .Datasource_channel -}}_update_env_t;
+typedef {{.Handler -}}* {{.Datasource_name -}}_{{- .Datasource_channel -}}_gtable_env_t;
 typedef galois::gdatabus::event_traits_t<{{- .Datasource_channel -}}> {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits;
 class {{.Datasource_name -}}_{{- .Datasource_channel -}}_callbacks : public
     galois::gdatabus::schema_callbacks<
-    {{.Datasource_name -}}_{{- .Datasource_channel -}}_parse_env_t,
-    {{.Datasource_name -}}_{{- .Datasource_channel -}}_update_env_t,
+    {{.Datasource_name -}}_{{- .Datasource_channel -}}_gtable_env_t,
     {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits
 > {
 public:
@@ -39,8 +37,9 @@ public:
 {{- end}}
 
 class {{.Name -}}_schema : 
-    public galois::gdatabus::default_traits<{{.Handler -}}*, {{.Handler -}}*> {
+    public galois::gdatabus::default_traits<{{.Handler -}}*> {
 public:
+    typedef {{.Handler -}}* gtable_env;
 {{- range .Dataviews}}
     typedef {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits {{.Datasource_channel -}};
     typedef {{.Datasource_name -}}_{{- .Datasource_channel -}}_callbacks {{.Datasource_channel -}}_callbacks;

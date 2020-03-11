@@ -4,6 +4,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type Dataupdator struct {
@@ -48,5 +49,6 @@ func (d *Dataupdator) SetCppcode(_cpp string) {
 }
 
 func (d *Dataupdator) Setup() error {
+	d.Name = strings.Replace(d.Name, "|", "_to_", -1)
 	return nil
 }

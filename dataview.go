@@ -19,6 +19,7 @@ type Dataview struct {
 	Cppcode            string
 	Datasource_name    string
 	Datasource_channel string
+	Dataupdators       []*Dataupdator
 }
 
 func (d *Dataview) Test() string {
@@ -56,6 +57,7 @@ func (d *Dataview) SetCppcode(_cpp string) {
 }
 
 func (d *Dataview) Setup() error {
+	d.Dataupdators = make([]*Dataupdator, 0, 0)
 	spl := strings.Split(d.Channel, "::")
 	if len(spl) == 2 {
 		d.Datasource_name = spl[0]

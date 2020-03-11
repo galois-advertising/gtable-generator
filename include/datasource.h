@@ -11,5 +11,6 @@ public:
     virtual bool reload(uint32_t token_num) = 0;
     virtual int add_record(const galois::gformat::pack_header_t& heade,
             const char *data, size_t data_len) = 0;
+    virtual ~datasource(){}
 };
 } 

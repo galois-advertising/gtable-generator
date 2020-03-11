@@ -27,20 +27,18 @@ public:
 
     virtual ~databus_datasource() {}
 
-    bool create(void* param) {
+    bool create(void* env) {
         loader = std::make_shared<databus_loader_t>();
         if (loader == nullptr) {
             FATAL("Failed to create databus loader handler", "");
             return false;
         }
 
-        //if (loader->create(_loader_env) < 0) {
-        //    FATAL("failed to create", "");
-        //    return false;
-        //}
-        //loader->set_update_env(p_handle);
-        //loader->set_parse_env(p_handle);
-        return false;
+        if (loader->init(static_cast<typename databus_traits::gtable_env>(env)) < 0) {
+            FATAL("failed to create", "");
+            return false;
+        }
+        return true;
     }
 
     bool init_load(void* param) {

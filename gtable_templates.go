@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -55,6 +56,15 @@ func (gt *Gtable_templates) generate_dataview(out_path string, dv *Dataview) {
 		if err := tmpl.Execute(h_file, dv); err != nil {
 			panic(err.Error())
 		}
+	}
+	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, dv.Name))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer h_file.Close()
+	tmpl := gt.tmpls["dataview_h.t"]
+	if err := tmpl.Execute(h_file, dv); err != nil {
+		panic(err.Error())
 	}
 }
 
@@ -120,6 +130,21 @@ func (gt *Gtable_templates) generate_datasource(out_path string, ds *Datasource)
 	}
 }
 
+func (gt *Gtable_templates) generate_project(out_path string, p *Project) error {
+	h_file, err := os.Create(fmt.Sprintf("%s/include/project.h", out_path))
+	if err != nil {
+		msg := fmt.Sprintf("Create file [%s] fail for %s", "env.h", err.Error())
+		log.Fatal(msg)
+		return errors.New(msg)
+	}
+	defer h_file.Close()
+	tmpl := gt.tmpls["project_h.t"]
+	if err := tmpl.Execute(h_file, p); err != nil {
+		panic(err.Error())
+	}
+	return nil
+}
+
 func (gt *Gtable_templates) Generate(out_path string, data interface{}) {
 	if !exists(out_path) {
 		panic(fmt.Sprintf("[%s] does not exists.", out_path))
@@ -132,6 +157,8 @@ func (gt *Gtable_templates) Generate(out_path string, data interface{}) {
 		gt.generate_dataview(out_path, data.(*Dataview))
 	case *Datasource:
 		gt.generate_datasource(out_path, data.(*Datasource))
+	case *Project:
+		gt.generate_project(out_path, data.(*Project))
 	default:
 		panic(fmt.Sprintf("Unknow type"))
 	}

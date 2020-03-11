@@ -31,6 +31,5 @@ func (d *Datatable) SetCppcode(_cpp string) {
 
 func (d *Datatable) Setup() error {
 	d.Include_dataview_headers = []string{"common.h", "b.h"}
-	d.Namespace = "galois::gtable"
 	return nil
 }

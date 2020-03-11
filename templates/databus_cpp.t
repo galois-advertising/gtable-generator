@@ -5,6 +5,7 @@ solopointer1202@gmail.com
 
 #include "log.h"
 #include <type_traits>
+#include "project.h"
 
 #include "{{.Name -}}.h"
 {{- range $idv, $dv := .Dataviews }}
@@ -21,14 +22,14 @@ class {{.Handler}};
 
 
 int {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_callbacks::insert({{$dv.Handler -}}* env, const galois::gformat::pack_header_t& header,
-    const typename {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_etraits::update_t& data) {
+    const typename {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_etraits::update_t& raw) {
     typename {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_etraits::derivative_t derivative;
 
 {{- range $icol, $col := .Columns}}
 
 {{- if eq $col.Colume_from "derivative"}}
     std::remove_reference<decltype(derivative.{{- $col.Column_name -}}())>::type temp_{{- $col.Column_name -}};
-    if (!{{- $dv.Get_udf -}}<int>::parse_{{- $col.Column_name -}}(data.{{- $col.Get_from -}}(), temp_{{- $col.Column_name -}})) {
+    if (!{{- $dv.Get_udf -}}<int>::parse_{{- $col.Column_name -}}(raw.{{- $col.Get_from -}}(), temp_{{- $col.Column_name -}})) {
         FATAL("Parse %s failed!", "{{- $col.Column_name -}}");
         return -1;
     } else {
@@ -37,16 +38,17 @@ int {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_callbacks::insert({
 {{- end}}
 
 {{- end}}
+    env->{{- $dv.Name -}}_var()->notify_insert(raw, derivative);
     return 0;
 };
 
 int {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_callbacks::del({{$dv.Handler -}}* env, const galois::gformat::pack_header_t& header,
-    const typename {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_etraits::delete_t& data) {
+    const typename {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_etraits::delete_t& raw) {
     return 0;
 };
 
 int {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_callbacks::update({{$dv.Handler -}}* env, const galois::gformat::pack_header_t& header,
-    const typename {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_etraits::update_t& data) {
+    const typename {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_etraits::update_t& raw) {
     return 0;
 };
 

@@ -4,6 +4,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type Indexupdator struct {
@@ -47,5 +48,6 @@ func (d *Indexupdator) SetCppcode(_cpp string) {
 }
 
 func (d *Indexupdator) Setup() error {
+	d.Name = strings.Replace(d.Name, "|", "_to_", -1)
 	return nil
 }

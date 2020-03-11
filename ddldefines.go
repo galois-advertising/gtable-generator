@@ -1,6 +1,8 @@
 //solopointer1202@gmail.com
 package main
 
+import "log"
+
 type Iddl interface {
 	SetNamespace(string)
 	SetHandler(string)
@@ -18,10 +20,11 @@ type DdlDefines struct {
 	Dataupdators      []Dataupdator  `xml:"dataupdator"`
 	Datatables        []Datatable    `xml:"datatable"`
 	Indexupdators     []Indexupdator `xml:"indexupdator"`
-	Indextalbes       []Indextable   `xml:"indextable"`
+	Indextables       []Indextable   `xml:"indextable"`
 }
 
 func (d *DdlDefines) Setup() error {
+	log.Printf("DDL namespace:%s", d.Namespace)
 	for i, _ := range d.Datasources {
 		d.Datasources[i].SetNamespace(d.Namespace)
 		d.Datasources[i].SetHandler(d.Handler)
@@ -52,11 +55,11 @@ func (d *DdlDefines) Setup() error {
 		d.Indexupdators[i].SetCppcode(d.Cppcode)
 		d.Indexupdators[i].Setup()
 	}
-	for i, _ := range d.Indextalbes {
-		d.Indextalbes[i].SetNamespace(d.Namespace)
-		d.Indextalbes[i].SetHandler(d.Handler)
-		d.Indextalbes[i].SetCppcode(d.Cppcode)
-		d.Indextalbes[i].Setup()
+	for i, _ := range d.Indextables {
+		d.Indextables[i].SetNamespace(d.Namespace)
+		d.Indextables[i].SetHandler(d.Handler)
+		d.Indextables[i].SetCppcode(d.Cppcode)
+		d.Indextables[i].Setup()
 	}
 	return nil
 }

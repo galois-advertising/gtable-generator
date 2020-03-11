@@ -16,6 +16,7 @@ Installation dependency:
 $ go build -o gtable-generator *.go
 $ cp gtable-generator /usr/local/bin
 $ cp -r include /usr/local/bin/gtable-generator-include
+$ cp -r include /usr/local/bin/gtable-generator-src
 $ cp -r templates /usr/local/bin/gtable-generator-templates
 ```
 
