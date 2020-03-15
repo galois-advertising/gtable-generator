@@ -22,7 +22,7 @@ func TestField(t *testing.T) {
 		log.Fatalf("Error:%s", err.Error())
 	} else {
 		log.Print(f)
-		log.Println(f.Constrains_list[1].Prop)
-		log.Println(len(f.Constrains_list[0].Prop))
+		log.Println(f.Constrains[1].Prop)
+		log.Println(len(f.Constrains[0].Prop))
 	}
 }

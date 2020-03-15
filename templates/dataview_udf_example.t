@@ -3,14 +3,14 @@
 namespace {{.Namespace}} {
 
 template <typename traits>
-class {{ .Get_udf }} {
+class {{ .GetUDF }} {
 public:
 {{- range $icol, $col := .Columns}}
-{{- if eq $col.Colume_from "derivative"}}
+{{- if eq $col.IsDerivative "derivative"}}
     template<typename F, typename T>
     static bool parse_{{- $col.Column_name}}(
-            const F& {{ $col.Get_from -}},
-            T& {{ $col.Column_name -}}) {
+            const F& {{ $col.Parse_from -}}_in,
+            T& {{ $col.Column_name -}}_out) {
         return false;
     }
 

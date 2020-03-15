@@ -9,24 +9,38 @@ import (
 )
 
 type Dataview struct {
-	Name               string     `xml:"name"`
-	Channel            string     `xml:"channel"`
-	Columns            []Column   `xml:"columns_node>column_node"`
-	Notations          []string   `xml:"notations>notation"`
-	Properties         []Property `xml:"property"`
-	Namespace          string
-	Handler            string
-	Cppcode            string
-	Datasource_name    string
-	Datasource_channel string
-	Dataupdators       []*Dataupdator
+	Name              string     `xml:"name"`
+	Channel           string     `xml:"channel"`
+	Columns           []Column   `xml:"columns_node>column_node"`
+	Notations         []string   `xml:"notations>notation"`
+	Properties        []Property `xml:"property"`
+	Namespace         string
+	Handler           string
+	Cppcode           string
+	DatasourceName    string
+	DatasourceChannel string
+	Dataupdators      []*Dataupdator
 }
 
-func (d *Dataview) Test() string {
-	return "TestTestTest"
+func (d *Dataview) IsDerivative(name string) (string, error) {
+	result := ""
+	for _, col := range d.Columns {
+		if col.Column_name == name {
+			if len(result) == 0 || result == "original" {
+				result = col.IsDerivative
+			}
+		}
+	}
+	if len(result) == 0 {
+		msg := fmt.Sprintf("IsDerivative: Cannot find column [%s] in [%s]", name, d.Name)
+		log.Fatal(msg)
+		return "", errors.New(msg)
+	} else {
+		return result, nil
+	}
 }
 
-func (d *Dataview) Has_udf() bool {
+func (d *Dataview) HasUDF() bool {
 	for _, v := range d.Properties {
 		if v.Name == "udf" {
 			return true
@@ -35,7 +49,7 @@ func (d *Dataview) Has_udf() bool {
 	return false
 }
 
-func (d *Dataview) Get_udf() (string, error) {
+func (d *Dataview) GetUDF() (string, error) {
 	for _, v := range d.Properties {
 		if v.Name == "udf" {
 			return v.Value, nil
@@ -60,10 +74,10 @@ func (d *Dataview) Setup() error {
 	d.Dataupdators = make([]*Dataupdator, 0, 0)
 	spl := strings.Split(d.Channel, "::")
 	if len(spl) == 2 {
-		d.Datasource_name = spl[0]
-		d.Datasource_channel = spl[1]
+		d.DatasourceName = spl[0]
+		d.DatasourceChannel = spl[1]
 		log.Printf("Dataview:[%s] on [%s]::[%s]", d.Name,
-			d.Datasource_name, d.Datasource_channel)
+			d.DatasourceName, d.DatasourceChannel)
 	} else {
 		panic(fmt.Sprintf("%s is not a valid datasource channel", d.Channel))
 	}

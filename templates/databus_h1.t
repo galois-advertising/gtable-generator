@@ -16,22 +16,22 @@ class {{.Handler}};
 
 {{- range .Dataviews}}
 
-typedef {{.Handler -}}* {{.Datasource_name -}}_{{- .Datasource_channel -}}_gtable_env_t;
-typedef galois::gdatabus::event_traits_t<{{- .Datasource_channel -}}> {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits;
-class {{.Datasource_name -}}_{{- .Datasource_channel -}}_callbacks : public
+typedef {{.Handler -}}* {{.DatasourceName -}}_{{- .DatasourceChannel -}}_gtable_env_t;
+typedef galois::gdatabus::event_traits_t<{{- .DatasourceChannel -}}> {{.DatasourceName -}}_{{- .DatasourceChannel -}}_etraits;
+class {{.DatasourceName -}}_{{- .DatasourceChannel -}}_callbacks : public
     galois::gdatabus::schema_callbacks<
-    {{.Datasource_name -}}_{{- .Datasource_channel -}}_gtable_env_t,
-    {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits
+    {{.DatasourceName -}}_{{- .DatasourceChannel -}}_gtable_env_t,
+    {{.DatasourceName -}}_{{- .DatasourceChannel -}}_etraits
 > {
 public:
     static int insert({{.Handler -}}* env, const galois::gformat::pack_header_t& header,
-        const typename {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits::update_t& data);
+        const typename {{.DatasourceName -}}_{{- .DatasourceChannel -}}_etraits::update_t& data);
 
     static int del({{.Handler -}}* env, const galois::gformat::pack_header_t& header,
-        const typename {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits::delete_t& data);
+        const typename {{.DatasourceName -}}_{{- .DatasourceChannel -}}_etraits::delete_t& data);
 
     static int update({{.Handler -}}* env, const galois::gformat::pack_header_t& header,
-        const typename {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits::update_t& data);
+        const typename {{.DatasourceName -}}_{{- .DatasourceChannel -}}_etraits::update_t& data);
 };
 
 {{- end}}
@@ -41,8 +41,8 @@ class {{.Name -}}_schema :
 public:
     typedef {{.Handler -}}* gtable_env;
 {{- range .Dataviews}}
-    typedef {{.Datasource_name -}}_{{- .Datasource_channel -}}_etraits {{.Datasource_channel -}};
-    typedef {{.Datasource_name -}}_{{- .Datasource_channel -}}_callbacks {{.Datasource_channel -}}_callbacks;
+    typedef {{.DatasourceName -}}_{{- .DatasourceChannel -}}_etraits {{.DatasourceChannel -}};
+    typedef {{.DatasourceName -}}_{{- .DatasourceChannel -}}_callbacks {{.DatasourceChannel -}}_callbacks;
 {{end}}
 };
 

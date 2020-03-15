@@ -46,7 +46,7 @@ func exists(name string) bool {
 }
 
 func (gt *Gtable_templates) generate_dataview(out_path string, dv *Dataview) {
-	if udf, err := dv.Get_udf(); err == nil {
+	if udf, err := dv.GetUDF(); err == nil {
 		h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h.example", out_path, udf))
 		if err != nil {
 			log.Fatal(err)
@@ -69,6 +69,7 @@ func (gt *Gtable_templates) generate_dataview(out_path string, dv *Dataview) {
 }
 
 func (gt *Gtable_templates) generate_datatable(out_path string, dt *Datatable) {
+	log.Printf("Processing %s", dt.Name)
 	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, dt.Name))
 	if err != nil {
 		log.Fatal(err)
@@ -130,6 +131,23 @@ func (gt *Gtable_templates) generate_datasource(out_path string, ds *Datasource)
 	}
 }
 
+func (gt *Gtable_templates) generate_dataupdator(out_path string, du *Dataupdator) {
+	log.Printf("Processing %s", du.Name)
+	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, du.Name))
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer h_file.Close()
+	if tmpl, ok := gt.tmpls["dataupdator_h.t"]; ok {
+		if err := tmpl.Execute(h_file, du); err != nil {
+			panic(err.Error())
+		}
+	} else {
+		panic(fmt.Sprintf("Cannot find .h template for dataupdator"))
+	}
+}
+
 func (gt *Gtable_templates) generate_project(out_path string, p *Project) error {
 	h_file, err := os.Create(fmt.Sprintf("%s/include/project.h", out_path))
 	if err != nil {
@@ -157,6 +175,8 @@ func (gt *Gtable_templates) Generate(out_path string, data interface{}) {
 		gt.generate_dataview(out_path, data.(*Dataview))
 	case *Datasource:
 		gt.generate_datasource(out_path, data.(*Datasource))
+	case *Dataupdator:
+		gt.generate_dataupdator(out_path, data.(*Dataupdator))
 	case *Project:
 		gt.generate_project(out_path, data.(*Project))
 	default:

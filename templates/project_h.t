@@ -23,12 +23,12 @@
 {{ range .Indextables -}}
 #include "{{.Name -}}.h"
 {{ end -}}
-
+*/
 // Dataupdator
 {{ range .Dataupdators -}}
 #include "{{.Name -}}.h"
 {{ end -}}
-
+/*
 // Indexupdator
 {{ range .Indexupdators -}}
 #include "{{.Name -}}.h"
@@ -51,36 +51,37 @@ public:
     {{ range .Dataviews -}}
     DEFINE_HANDLER({{- .Name -}}_dataview, {{ .Name -}}_var);
     {{ end -}}
-/*
     // Datatable 
     {{ range .Datatables -}}
     DEFINE_HANDLER({{- .Name -}}_datatable, {{ .Name -}}_var);
     {{ end -}}
     
+/*
     // Indextable
     {{ range .Indextables -}}
     DEFINE_HANDLER({{- .Name -}}_indextable, {{ .Name -}}_var);
     {{ end -}}
+*/
     
 private:
     // Dataupdator
     {{ range .Dataupdators -}}
     DEFINE_HANDLER({{- .Name -}}_dataupdator, {{ .Name -}}_var);
     {{ end -}}
-    
+/*    
     // Indexupdator
     {{ range .Indexupdators -}}
     DEFINE_HANDLER({{- .Name -}}_indexupdator, {{ .Name -}}_var);
     {{ end -}}
 */
     bool dataupdator_linkto_dataview() {
-/*
         {{ range $idv, $dv := .Dataviews -}}
         {{ range $idp, $du := $dv.Dataupdators -}}
-            {{- $dv.Name -}}_dataview_var()->append_dataupdator({{ $du.Name -}}_var());
+            {{ $du.Name -}}_var().set_datatable(&{{ .To -}}_var()); 
+            {{ $dv.Name -}}_var().append_dataupdator(
+                    dynamic_cast<std::remove_reference<decltype({{- $dv.Name -}}_var())>::type::dataupdator_t>(&{{ $du.Name -}}_var()));
         {{ end -}}
         {{ end -}}
-*/
         return true;
     }
 };

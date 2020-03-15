@@ -12,7 +12,6 @@ namespace galois::gtable {
 
 class igtable {
 public:
-    virtual int create() = 0;
     virtual int initialize() = 0;
     virtual int load_base() = 0;
     virtual int reload() = 0;
@@ -20,10 +19,9 @@ public:
 
 class gtable_project: public igtable {
 public:
-    using _datasources_t = std::map<std::string, std::shared_ptr<galois::gtable::datasource>>;
+    using _datasources_t = std::map<std::string, std::shared_ptr<galois::gtable::idatasource>>;
     gtable_project();
     virtual ~gtable_project();
-    int create();
     int initialize();
     virtual bool dataupdator_linkto_dataview() = 0;
     virtual _datasources_t& _mutable_datasources() = 0;

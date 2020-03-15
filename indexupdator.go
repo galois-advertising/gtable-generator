@@ -27,7 +27,7 @@ func (d *Indexupdator) Get_type() (string, error) {
 	return "", errors.New(fmt.Sprintf("Could not find type of %s", d.Name))
 }
 
-func (d *Indexupdator) Get_udf() (string, error) {
+func (d *Indexupdator) GetUDF() (string, error) {
 	for _, v := range d.Properties {
 		if v.Name == "udf" {
 			return v.Value, nil

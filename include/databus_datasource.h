@@ -7,7 +7,7 @@
 
 namespace galois::gtable {
 template <typename databus_traits>
-class databus_datasource : public datasource {
+class databus_datasource : public idatasource {
     std::string my_name;
 public:
     class my_loader : public galois::gdatabus::loader<databus_traits> {
@@ -22,26 +22,27 @@ public:
 
     std::string name() const {return my_name;};
 
-    explicit databus_datasource(const std::string& _name) : my_name(_name), loader(NULL) {
+    explicit databus_datasource(const std::string& _name) : my_name(_name), loader(nullptr) {
     }
 
     virtual ~databus_datasource() {}
 
-    bool create(void* env) {
+    bool create(void* _env) {
+        env = static_cast<typename databus_traits::gtable_env>(_env);
         loader = std::make_shared<databus_loader_t>();
         if (loader == nullptr) {
             FATAL("Failed to create databus loader handler", "");
             return false;
         }
 
-        if (loader->init(static_cast<typename databus_traits::gtable_env>(env)) < 0) {
+        if (loader->init(env) < 0) {
             FATAL("failed to create", "");
             return false;
         }
         return true;
     }
 
-    bool init_load(void* param) {
+    bool load_base() {
         if (!loader->load_base()) {
             FATAL("Failed to load base", "");
             return false;
@@ -66,6 +67,8 @@ public:
     }
 private:
     std::shared_ptr<databus_loader_t> loader;
+    typename databus_traits::gtable_env env;
+
 };
 
 }  

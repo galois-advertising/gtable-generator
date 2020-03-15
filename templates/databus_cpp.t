@@ -9,8 +9,8 @@ solopointer1202@gmail.com
 
 #include "{{.Name -}}.h"
 {{- range $idv, $dv := .Dataviews }}
-{{- if $dv.Has_udf }}
-#include "{{- $dv.Get_udf }}.h"
+{{- if $dv.HasUDF }}
+#include "{{- $dv.GetUDF }}.h"
 {{- end }}
 {{- end }}
 
@@ -21,15 +21,15 @@ class {{.Handler}};
 {{- range $idv, $dv := .Dataviews}}
 
 
-int {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_callbacks::insert({{$dv.Handler -}}* env, const galois::gformat::pack_header_t& header,
-    const typename {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_etraits::update_t& raw) {
-    typename {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_etraits::derivative_t derivative;
+int {{$dv.DatasourceName -}}_{{- $dv.DatasourceChannel -}}_callbacks::insert({{$dv.Handler -}}* env, const galois::gformat::pack_header_t& header,
+    const typename {{$dv.DatasourceName -}}_{{- $dv.DatasourceChannel -}}_etraits::update_t& raw) {
+    typename {{$dv.DatasourceName -}}_{{- $dv.DatasourceChannel -}}_etraits::derivative_t derivative;
 
 {{- range $icol, $col := .Columns}}
 
-{{- if eq $col.Colume_from "derivative"}}
+{{- if eq $col.IsDerivative "derivative"}}
     std::remove_reference<decltype(derivative.{{- $col.Column_name -}}())>::type temp_{{- $col.Column_name -}};
-    if (!{{- $dv.Get_udf -}}<int>::parse_{{- $col.Column_name -}}(raw.{{- $col.Get_from -}}(), temp_{{- $col.Column_name -}})) {
+    if (!{{- $dv.GetUDF -}}<int>::parse_{{- $col.Column_name -}}(raw.{{- $col.Parse_from -}}(), temp_{{- $col.Column_name -}})) {
         FATAL("Parse %s failed!", "{{- $col.Column_name -}}");
         return -1;
     } else {
@@ -38,17 +38,20 @@ int {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_callbacks::insert({
 {{- end}}
 
 {{- end}}
-    env->{{- $dv.Name -}}_var()->notify_insert(raw, derivative);
+    if (!env->{{- $dv.Name -}}_var().notify_insert(raw, derivative)) {
+        FATAL("{{- $dv.Name -}}_var().notify_insert failed", "");
+        return -1;
+    }
     return 0;
 };
 
-int {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_callbacks::del({{$dv.Handler -}}* env, const galois::gformat::pack_header_t& header,
-    const typename {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_etraits::delete_t& raw) {
+int {{$dv.DatasourceName -}}_{{- $dv.DatasourceChannel -}}_callbacks::del({{$dv.Handler -}}* env, const galois::gformat::pack_header_t& header,
+    const typename {{$dv.DatasourceName -}}_{{- $dv.DatasourceChannel -}}_etraits::delete_t& raw) {
     return 0;
 };
 
-int {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_callbacks::update({{$dv.Handler -}}* env, const galois::gformat::pack_header_t& header,
-    const typename {{$dv.Datasource_name -}}_{{- $dv.Datasource_channel -}}_etraits::update_t& raw) {
+int {{$dv.DatasourceName -}}_{{- $dv.DatasourceChannel -}}_callbacks::update({{$dv.Handler -}}* env, const galois::gformat::pack_header_t& header,
+    const typename {{$dv.DatasourceName -}}_{{- $dv.DatasourceChannel -}}_etraits::update_t& raw) {
     return 0;
 };
 

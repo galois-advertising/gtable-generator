@@ -8,14 +8,16 @@ import (
 )
 
 type Dataupdator struct {
-	Name       string     `xml:"name"`
-	From       string     `xml:"from"`
-	To         string     `xml:"to"`
-	Properties []Property `xml:"property"`
-	Notations  []string   `xml:"notations>notation"`
-	Namespace  string
-	Handler    string
-	Cppcode    string
+	Name          string     `xml:"name"`
+	From          string     `xml:"from"`
+	To            string     `xml:"to"`
+	Properties    []Property `xml:"property"`
+	Notations     []string   `xml:"notations>notation"`
+	From_dataview *Dataview
+	To_datatable  *Datatable
+	Namespace     string
+	Handler       string
+	Cppcode       string
 }
 
 func (d *Dataupdator) Get_type() (string, error) {
@@ -27,7 +29,7 @@ func (d *Dataupdator) Get_type() (string, error) {
 	return "", errors.New(fmt.Sprintf("Could not find type of %s", d.Name))
 }
 
-func (d *Dataupdator) Get_udf() (string, error) {
+func (d *Dataupdator) GetUDF() (string, error) {
 	for _, v := range d.Properties {
 		if v.Name == "udf" {
 			return v.Value, nil

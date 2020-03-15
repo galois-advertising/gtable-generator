@@ -39,13 +39,13 @@ func (d *Project) build_datasource() error {
 		log.Printf("Datasource:[%s]", ds.Name)
 	}
 	for dvi, dv := range d.Dataviews {
-		if dsi, ok := _m[dv.Datasource_name]; ok {
+		if dsi, ok := _m[dv.DatasourceName]; ok {
 			d.Datasources[dsi].Dataviews = append(d.Datasources[dsi].Dataviews,
 				&d.Dataviews[dvi])
 			log.Printf("Dataview:[%s] -> Datasource:[%s]", dv.Name, d.Datasources[dsi].Name)
 		} else {
 			panic(fmt.Sprintf("Cannot find datasource[%s] of dataview[%s]",
-				dv.Datasource_name, dv.Name))
+				dv.DatasourceName, dv.Name))
 		}
 	}
 	return nil
@@ -66,6 +66,58 @@ func (d *Project) build_dataview() error {
 			log.Fatalf("dataupdator [%s]->[%s] : from not found", du.From, du.To)
 		}
 	}
+	return nil
+}
+
+func (d *Project) build_datatable() error {
+	for idt, _ := range d.Datatables {
+		for icol, col := range d.Datatables[idt].Columns {
+			d.Datatables[idt].Columns[icol].IsPrimarykey = false
+			for _, pk := range d.Datatables[idt].Primary_key.Keys {
+				if col.Column_name == pk {
+					d.Datatables[idt].Columns[icol].IsPrimarykey = true
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (d *Project) build_dataupdator() error {
+	_m_dataview := make(map[string]uint32)
+	for idx, dv := range d.Dataviews {
+		_m_dataview[dv.Name] = uint32(idx)
+	}
+	_m_datatable := make(map[string]uint32)
+	for idx, dt := range d.Datatables {
+		_m_datatable[dt.Name] = uint32(idx)
+	}
+	for idx, du := range d.Dataupdators {
+		log.Printf("Setting %s", du.Name)
+		if ifrom, ok := _m_dataview[du.From]; ok {
+			d.Dataupdators[idx].From_dataview = &d.Dataviews[ifrom]
+		} else {
+			msg := fmt.Sprintf("Cannot find the dataview of \"%s\":[%s]", du.Name, du.From)
+			log.Fatal(msg)
+			return errors.New(msg)
+		}
+		if ito, ok := _m_datatable[du.To]; ok {
+			d.Dataupdators[idx].To_datatable = &d.Datatables[ito]
+			for idtcol, dtcol := range d.Dataupdators[idx].To_datatable.Columns {
+				column_from, err := d.Dataupdators[idx].From_dataview.IsDerivative(dtcol.Column_name)
+				if err != nil {
+					return err
+				} else {
+					d.Dataupdators[idx].To_datatable.Columns[idtcol].IsDerivative = column_from
+				}
+			}
+		} else {
+			msg := fmt.Sprintf("Cannot find the datatable of \"%s\":[%s]", du.Name, du.From)
+			log.Fatal(msg)
+			return errors.New(msg)
+		}
+	}
+
 	return nil
 }
 
@@ -192,6 +244,16 @@ func (d *Project) LoadDDL(ddl_path string) error {
 		log.Fatal(errs)
 		return errors.New(errs)
 	}
+	if err := d.build_dataupdator(); err != nil {
+		errs := fmt.Sprintf("Build dataupdator fail for %s", err.Error())
+		log.Fatal(errs)
+		return errors.New(errs)
+	}
+	if err := d.build_datatable(); err != nil {
+		errs := fmt.Sprintf("Build datatable fail for %s", err.Error())
+		log.Fatal(errs)
+		return errors.New(errs)
+	}
 	if err := d.check_and_set_namespace(); err != nil {
 		return err
 	}
@@ -220,6 +282,12 @@ func (d *Project) Generate(templates_path string, out_path string) error {
 		}
 		for _, dv := range d.Dataviews {
 			tmps.Generate(out_path, &dv)
+		}
+		for _, du := range d.Dataupdators {
+			tmps.Generate(out_path, &du)
+		}
+		for _, dt := range d.Datatables {
+			tmps.Generate(out_path, &dt)
 		}
 	}
 	tmps.generate_project(out_path, d)

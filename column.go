@@ -9,11 +9,12 @@ import (
 )
 
 type Column struct {
-	XMLName         xml.Name    `xml:"column_node"`
-	Column_name     string      `xml:"name"`
-	Column_kind     KindAttr    `xml:"kind"`
-	Colume_from     string      `xml:"type,attr"`
-	Constrains_list []Constrain `xml:"constrains>constrain"`
+	XMLName       xml.Name    `xml:"column_node"`
+	Column_name   string      `xml:"name"`
+	Column_kind   KindAttr    `xml:"kind"`
+	IsDerivative string      `xml:"type,attr"`
+	Constrains    []Constrain `xml:"constrains>constrain"`
+	IsPrimarykey  bool
 }
 
 type KindAttr struct {
@@ -27,11 +28,11 @@ type Constrain struct {
 	Name string `xml:",chardata"`
 }
 
-func (c *Column) Get_from() (string, error) {
-	if c.Colume_from != "derivative" {
+func (c *Column) Parse_from() (string, error) {
+	if c.IsDerivative != "derivative" {
 		return "", errors.New(fmt.Sprintf("%s is not a derivative column", c.Column_name))
 	}
-	for _, v := range c.Constrains_list {
+	for _, v := range c.Constrains {
 		if v.Name == "from" {
 			return v.Prop, nil
 		}
@@ -43,15 +44,15 @@ func (c *Column) UpperName() string {
 	return strings.ToUpper(c.Column_name)
 }
 
-func (c *Column) Is_basic() bool {
+func (c *Column) IsBasic() bool {
 	return c.Column_kind.Kind == "basic" && c.Column_kind.Type != "binary"
 }
 
-func (c *Column) Is_string() bool {
+func (c *Column) IsString() bool {
 	return c.Column_kind.Kind == "array" && c.Column_kind.Type == "char"
 }
 
-func (c *Column) Is_array() bool {
+func (c *Column) IsArray() bool {
 	return c.Column_kind.Kind == "array" && c.Column_kind.Type != "char"
 }
 
@@ -60,7 +61,7 @@ func (c *Column) Is_binary() bool {
 }
 
 func (c *Column) Length() string {
-	if c.Is_array() || c.Is_string() {
+	if c.IsArray() || c.IsString() {
 		return c.Column_kind.Length
 	} else {
 		return "0"

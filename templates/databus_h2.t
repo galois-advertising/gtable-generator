@@ -1,7 +1,7 @@
-typedef {{.Handler -}}* {{.Datasource_name -}}_gtable_env_t;
-class {{.Datasource_name -}}_traits :
+typedef {{.Handler -}}* {{.DatasourceName -}}_gtable_env_t;
+class {{.DatasourceName -}}_traits :
     public galois::gdatabus::default_traits<
-        {{.Datasource_name -}}_gtable_env_t
+        {{.DatasourceName -}}_gtable_env_t
     > {
 public:
     typedef {{.Handler}} handle_t;
@@ -12,5 +12,5 @@ public:
 
 };
 
-typedef galois::gtable::databus_datasource<{{.Datasource_name -}}_traits> {{.Datasource_name}};
+typedef galois::gtable::databus_datasource<{{.DatasourceName -}}_traits> {{.DatasourceName}};
 }

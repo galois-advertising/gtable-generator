@@ -14,14 +14,17 @@ public:
     using update_raw_t = typename traits::update_raw_t;
     using update_derivative_t = typename traits::update_derivative_t;
     using delete_key_t = typename traits::delete_key_t;
-    using dataupdator_t = std::shared_ptr<idataupdator<traits>>;
+    using dataupdator_t = idataupdator<traits>*;
 
 
 public:
-    explicit dataview(const std::string& name) : _name(name) {}
+    const char* name() {
+        return traits::name();
+    }
 
     bool append_dataupdator(dataupdator_t p_notifier) {
         if (p_notifier == nullptr) {
+            FATAL("p_notifier is nullptr", "");
             return false;
         }
         dataupdators.push_back(p_notifier);
@@ -29,8 +32,10 @@ public:
     }
 
     bool notify_insert(const insert_raw_t& raw, const insert_derivative_t& derivative) {
+        DEBUG("begin notify_insert.", "");
         for (auto du : dataupdators) {
             if (!du->notify_insert(raw, derivative)) {
+                FATAL("notify_insert fail.", "");
                 return false;
             }
         }
@@ -55,12 +60,7 @@ public:
         return true;
     }
 
-    const std::string& name() const {
-        return _name;
-    }
-
 private:
-    std::string _name;
     std::list<dataupdator_t> dataupdators;
 };
 

@@ -52,7 +52,7 @@ func TestDataview(t *testing.T) {
 	} else {
 		const tmpl = `
         {{.Name}}
-        {{.Get_udf}}
+        {{.GetUDF}}
     `
 		t := template.Must(template.New("html").Parse(tmpl))
 		err = t.Execute(os.Stdout, &d)

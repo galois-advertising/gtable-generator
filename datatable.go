@@ -1,20 +1,42 @@
 // solopointer1202@gmail.com
 package main
 
+import (
+	"fmt"
+	"log"
+	"strings"
+)
+
 type Datatable struct {
-	Name                     string     `xml:"name"`
-	Columns                  []Column   `xml:"columns_node>column_node"`
-	Primary_key              Primarykey `xml:"primary_key"`
-	Notations                []string   `xml:"notations>notation"`
-	Include_dataview_headers []string
-	Namespace                string
-	Handler                  string
-	Cppcode                  string
+	Name        string     `xml:"name"`
+	Columns     []Column   `xml:"columns_node>column_node"`
+	Primary_key Primarykey `xml:"primary_key"`
+	Notations   []string   `xml:"notations>notation"`
+	Namespace   string
+	Handler     string
+	Cppcode     string
 }
 
 type Primarykey struct {
-	Name string `xml:",chardata"`
+	Text string `xml:",chardata"`
 	Type string `xml:"type,attr"`
+	Keys []string
+}
+
+func (d *Datatable) Is_primarykey(name string) bool {
+	for _, col := range d.Columns {
+		if col.Column_name == name {
+			for _, pk := range d.Primary_key.Keys {
+				if name == pk {
+					return true
+				}
+			}
+			return false
+		}
+	}
+	msg := fmt.Sprintf("Is_primarykey: Cannot find column [%s] in [%s]", name, d.Name)
+	log.Fatal(msg)
+	return false
 }
 
 func (d *Datatable) SetNamespace(_ns string) {
@@ -30,6 +52,6 @@ func (d *Datatable) SetCppcode(_cpp string) {
 }
 
 func (d *Datatable) Setup() error {
-	d.Include_dataview_headers = []string{"common.h", "b.h"}
+	d.Primary_key.Keys = strings.Split(d.Primary_key.Text, ",")
 	return nil
 }

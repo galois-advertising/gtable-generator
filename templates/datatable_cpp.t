@@ -1,49 +1,28 @@
-#include "../{{.Name -}}.h"
+#include "{{.Name -}}.h"
 
-{{.Namespace}} {
+namespace {{.Namespace}} {
 
-const char* {{.Name}}_schema::PRIMARY_KEY_FIELDS = "{{.Primary_key.Name}}";
-
-void {{.Name}}_schema::make_object_tuple(
-        const {{.Name}}ObjectTupleRef& ref,
-        {{.Name}}ObjectTuple* tuple) {
-${make_object_tuple_from_ref}
-}
-
-void {{.Name}}_schema::make_basic_tuple(
-        const {{.Name}}ObjectTuple &tuple,
-        {{.Name}}BasicTuple* basic) {
-${copy_basic_field}
-}
-
-bool {{.Name}}_schema::is_valid_object_tuple(
-        const {{.Name}}ObjectTuple &tuple) {
-${check_is_valid_fields}
-    return true;
-}
-
-${def_var_member}
-
-int {{.Name}}::insert_var_pools(
-        TBasicTuple &basic, 
-        const TObjectTuple &tuple) {
-    int succ_idx[TSchema::VAR_POOL_NUM];
-    int succ_idx_num = 0;
-    do {
-${write_var_pool}
-
-        return 0;
-    } while (0);
-
-    for (int i = 0; i < succ_idx_num; ++i) {
-        int idx = succ_idx[i];
-        _p_var_pools[idx]->free(basic._var_ptrs[idx]);
+std::ostream & operator<< (std::ostream& os, const {{.Name}}_row_tuple& tuple) {
+{{- range $index, $element := .Columns -}}
+{{- if $element.IsArray }}
+    if (tuple.is_set_{{- $element.Column_name }}()) {
+        os << "|{{ $element.Column_name -}}: [";
+        for (auto& i : tuple.{{- $element.Column_name -}}()) {
+            os << i << ",";
+        }
+        os << "]";
+    } else {
+        os << "|{{ $element.Column_name -}}: [-]";
     }
-    return -1;
+{{- else }}
+    if (tuple.is_set_{{- $element.Column_name -}}()) {
+        os << "|{{ $element.Column_name -}}: " << tuple.{{- $element.Column_name -}}();
+    } else {
+        os << "|{{ $element.Column_name -}}: -";
+    }
+{{- end }}
+{{- end }}
+    return os;
 }
 
-int {{.Name}}::do_create_basic_pool(TBasicPool* p_basic_pool)
-{
-${create_basic_pool}
-}
 }
