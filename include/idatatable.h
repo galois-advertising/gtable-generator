@@ -1,3 +1,7 @@
+/* 
+This code is generated automatically by gtable-generator, do not modify it. 
+solopointer1202@gmail.com
+*/
 #include <unordered_map>
 
 namespace galois::gtable {
@@ -11,6 +15,7 @@ public:
     virtual bool insert(const row_t& tuple) = 0;
     virtual bool update(const row_t& tuple, row_t& old) = 0;
     virtual bool del(const primary_key_t& pk) = 0;
+    virtual ~idatatable(){};
 };
 
 }

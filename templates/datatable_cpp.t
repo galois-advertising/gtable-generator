@@ -1,3 +1,7 @@
+/* 
+This code is generated automatically by gtable-generator, do not modify it. 
+solopointer1202@gmail.com
+*/
 #include "{{.Name -}}.h"
 
 namespace {{.Namespace}} {

@@ -1,3 +1,7 @@
+/* 
+This code is generated automatically by gtable-generator, do not modify it. 
+solopointer1202@gmail.com
+*/
 #pragma once
 
 #define DEFINE_HANDLER(type, name) \

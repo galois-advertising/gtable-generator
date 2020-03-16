@@ -1,10 +1,13 @@
+/* 
+This code is generated automatically by gtable-generator, do not modify it. 
+solopointer1202@gmail.com
+*/
 #pragma once
-// solopointer1202@gmail.com
 #include "default_dataupdator.h"
 #include "{{- .From -}}.h"
 #include "{{- .To -}}.h"
 
-namespace {{ .Namespace }}{
+namespace {{ .Namespace }} {
 class {{ .Handler }};
 
 template <typename dataview_traits>
@@ -57,4 +60,10 @@ bool {{ .Name -}}_traits<dataview_traits>::make_primary_key(const insert_raw_t&,
 
 using {{ .Name -}}_dataupdator = galois::gtable::default_dataupdator<{{- .From -}}_traits, {{ .Name -}}_traits>;
 
+/*
+{{ .From -}}_traits: The type traits of dataview, it's a smaller traits
+{{ .Name -}}_traits: The type traits of dataupdator, {{ .Name -}}_traits contains {{ .From -}}_traits. It is a bigger traits.
+Why not use {{ .Name -}}_traits directly?
+Because of default_dataupdator inherits from idataupdator and idataupdator needs {{ .From -}}_traits.
+*/
 } 

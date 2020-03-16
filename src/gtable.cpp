@@ -17,8 +17,8 @@ int gtable_project::initialize() {
             return -1;
         }
     }
-    if (!dataupdator_linkto_dataview()) {
-        FATAL("Failed to dataupdator_linkto_dataview", "");
+    if (!setup_dataupdator()) {
+        FATAL("Failed to setup_dataupdator", "");
         return -1;
     }
     return 0;

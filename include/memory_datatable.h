@@ -1,3 +1,7 @@
+/* 
+This code is generated automatically by gtable-generator, do not modify it. 
+solopointer1202@gmail.com
+*/
 #pragma once
 #include <unordered_map>
 #include <sstream>
@@ -15,7 +19,13 @@ public:
     using primary_key_t = typename traits::primary_key_t;
     using idatatable_t = idatatable<traits>;
     bool insert(const row_t& tuple) {
-        database[tuple.primary_key()] = tuple;
+        try {
+            database[tuple.primary_key()] = tuple;
+        } catch (std::bad_alloc & ) {
+            FATAL("Out of memory when inserting new row", "");
+        } catch (...) {
+            FATAL("Unknown error when inserting new row", "");
+        }
 #ifdef _DEBUG
         std::stringstream ss;
         ss << tuple;

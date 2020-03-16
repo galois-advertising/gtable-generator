@@ -121,6 +121,38 @@ func (d *Project) build_dataupdator() error {
 	return nil
 }
 
+func (d *Project) build_indextable() error {
+	for iit, it := range d.Indextables {
+		for _, dt := range d.Datatables {
+			if it.OnTable == dt.Name {
+				for _, col := range dt.Columns {
+					if col.Column_name == it.OnColumn {
+						if d.Indextables[iit].KeyType == "" ||
+							col.Column_kind.Kind == "original" {
+							if col.IsArray() {
+								d.Indextables[iit].KeyType = ""
+								msg := fmt.Sprintf("Array [%s] can not be used for index key",
+									col.Column_name)
+								log.Fatal(msg)
+							} else if col.IsString() {
+								d.Indextables[iit].KeyType = "std::string"
+							} else {
+								d.Indextables[iit].KeyType = col.Column_kind.Type
+							}
+						}
+					}
+				}
+			}
+		}
+		if d.Indextables[iit].KeyType == "" {
+			msg := fmt.Sprintf("Cannot find type of %s::%s", it.OnTable, it.OnColumn)
+			log.Fatal(msg)
+			return errors.New(msg)
+		}
+	}
+	return nil
+}
+
 func (d *Project) Init() {
 	d.Datasources = []Datasource{}
 	d.Dataviews = []Dataview{}
@@ -254,6 +286,11 @@ func (d *Project) LoadDDL(ddl_path string) error {
 		log.Fatal(errs)
 		return errors.New(errs)
 	}
+	if err := d.build_indextable(); err != nil {
+		errs := fmt.Sprintf("Build indextable fail for %s", err.Error())
+		log.Fatal(errs)
+		return errors.New(errs)
+	}
 	if err := d.check_and_set_namespace(); err != nil {
 		return err
 	}
@@ -266,16 +303,16 @@ func (d *Project) LoadDDL(ddl_path string) error {
 
 func (d *Project) Generate(templates_path string, out_path string) error {
 	if !DirExists(templates_path) {
-		errs := fmt.Sprintf("%s not exists or not a directory.", templates_path)
+		errs := fmt.Sprintf("Template path [%s] not exists or not a directory.", templates_path)
 		log.Fatal(errs)
 		return errors.New(errs)
 	}
 	if !DirExists(out_path) {
-		errs := fmt.Sprintf("%s not exists or not a directory.", out_path)
+		errs := fmt.Sprintf("Output path [%s] not exists or not a directory.", out_path)
 		log.Fatal(errs)
 		return errors.New(errs)
 	}
-	var tmps Gtable_templates
+	var tmps GtableTemplates
 	if err := tmps.Init(templates_path); err == nil {
 		for _, ds := range d.Datasources {
 			tmps.Generate(out_path, &ds)
@@ -288,6 +325,9 @@ func (d *Project) Generate(templates_path string, out_path string) error {
 		}
 		for _, dt := range d.Datatables {
 			tmps.Generate(out_path, &dt)
+		}
+		for _, it := range d.Indextables {
+			tmps.Generate(out_path, &it)
 		}
 	}
 	tmps.generate_project(out_path, d)

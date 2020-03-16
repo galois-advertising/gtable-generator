@@ -2,15 +2,15 @@
 package main
 
 type Indextable struct {
-	Name                     string   `xml:"name"`
-	Ontable                  string   `xml:"on_table"`
-	OnColumn                 string   `xml:"on_column"`
-	Columns                  []Column `xml:"columns_node>column_node"`
-	Notations                []string `xml:"notations>notation"`
-	Include_dataview_headers []string
-	Namespace                string
-	Handler                  string
-	Cppcode                  string
+	Name      string   `xml:"name"`
+	OnTable   string   `xml:"on_table"`
+	OnColumn  string   `xml:"on_column"`
+	Columns   []Column `xml:"columns_node>column_node"`
+	Notations []string `xml:"notations>notation"`
+	KeyType   string
+	Namespace string
+	Handler   string
+	Cppcode   string
 }
 
 func (d *Indextable) SetNamespace(_ns string) {
@@ -26,6 +26,5 @@ func (d *Indextable) SetCppcode(_cpp string) {
 }
 
 func (d *Indextable) Setup() error {
-	d.Include_dataview_headers = []string{"common.h", "b.h"}
 	return nil
 }

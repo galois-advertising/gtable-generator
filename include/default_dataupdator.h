@@ -1,5 +1,9 @@
+/* 
+This code is generated automatically by gtable-generator, do not modify it. 
+solopointer1202@gmail.com
+*/
 #pragma once
-// solopointer1202@gmail.com
+
 namespace galois::gtable {
 
 template <typename dataview_traits, template<class> class dataupdator_traits>

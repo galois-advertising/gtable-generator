@@ -5,6 +5,6 @@ import (
 )
 
 func TestGtableTemplates(t *testing.T) {
-	var ts Gtable_templates
+	var ts GtableTemplates
 	ts.Init("../templates/")
 }

@@ -1,3 +1,7 @@
+/* 
+This code is generated automatically by gtable-generator, do not modify it. 
+solopointer1202@gmail.com
+*/
 #pragma once
 #include <memory>
 #include <map>
@@ -13,17 +17,14 @@
 {{ range .Dataviews -}}
 #include "{{.Name -}}.h"
 {{ end -}}
-/*
 // Datatable 
 {{ range .Datatables -}}
 #include "{{.Name -}}.h"
 {{ end -}}
-
 // Indextable
 {{ range .Indextables -}}
 #include "{{.Name -}}.h"
 {{ end -}}
-*/
 // Dataupdator
 {{ range .Dataupdators -}}
 #include "{{.Name -}}.h"
@@ -55,14 +56,10 @@ public:
     {{ range .Datatables -}}
     DEFINE_HANDLER({{- .Name -}}_datatable, {{ .Name -}}_var);
     {{ end -}}
-    
-/*
     // Indextable
     {{ range .Indextables -}}
     DEFINE_HANDLER({{- .Name -}}_indextable, {{ .Name -}}_var);
     {{ end -}}
-*/
-    
 private:
     // Dataupdator
     {{ range .Dataupdators -}}
@@ -74,12 +71,12 @@ private:
     DEFINE_HANDLER({{- .Name -}}_indexupdator, {{ .Name -}}_var);
     {{ end -}}
 */
-    bool dataupdator_linkto_dataview() {
+    bool setup_dataupdator() {
         {{ range $idv, $dv := .Dataviews -}}
         {{ range $idp, $du := $dv.Dataupdators -}}
-            {{ $du.Name -}}_var().set_datatable(&{{ .To -}}_var()); 
-            {{ $dv.Name -}}_var().append_dataupdator(
-                    dynamic_cast<std::remove_reference<decltype({{- $dv.Name -}}_var())>::type::dataupdator_t>(&{{ $du.Name -}}_var()));
+        {{ $du.Name -}}_var().set_datatable(&{{ .To -}}_var()); 
+        {{ $dv.Name -}}_var().append_dataupdator(
+            dynamic_cast<std::remove_reference<decltype({{- $dv.Name -}}_var())>::type::dataupdator_t>(&{{ $du.Name -}}_var()));
         {{ end -}}
         {{ end -}}
         return true;

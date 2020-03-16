@@ -1,5 +1,8 @@
+/* 
+This code is generated automatically by gtable-generator, do not modify it. 
+solopointer1202@gmail.com
+*/
 #pragma once
-// solopointer1202@gmail.com
 #include <vector>
 #include <ostream>
 #include "memory_datatable.h"
