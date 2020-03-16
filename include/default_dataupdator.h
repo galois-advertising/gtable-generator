@@ -3,17 +3,21 @@ This code is generated automatically by gtable-generator, do not modify it.
 solopointer1202@gmail.com
 */
 #pragma once
+#include "dataupdator.h"
 
 namespace galois::gtable {
 
 template <typename dataview_traits, template<class> class dataupdator_traits>
 class default_dataupdator : public idataupdator<dataview_traits> {
 public:
+    // from dataview_traits
     using insert_raw_t = typename dataview_traits::insert_raw_t;
     using insert_derivative_t = typename dataview_traits::insert_derivative_t;
     using update_raw_t = typename dataview_traits::update_raw_t;
     using update_derivative_t = typename dataview_traits::update_derivative_t;
     using delete_key_t = typename dataview_traits::delete_key_t;
+
+    // from dataupdator_traits
     using data_table = typename dataupdator_traits<dataview_traits>::data_table;
     using idatatable_t = typename data_table::idatatable_t;
 

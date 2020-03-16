@@ -5,10 +5,10 @@ solopointer1202@gmail.com
 #pragma once
 #include <unordered_map>
 #include <sstream>
+#include <list>
 #include "log.h"
-// solopointer1202@gmail.com
-
 #include "idatatable.h"
+#include "indexupdator.h"
 
 namespace galois::gtable {
 
@@ -18,6 +18,17 @@ public:
     using row_t = typename traits::row_t;
     using primary_key_t = typename traits::primary_key_t;
     using idatatable_t = idatatable<traits>;
+    using indexupdator_t = iindexupdator<traits>*;
+
+    bool append_indexupdator(indexupdator_t p_notifier) {
+        if (p_notifier == nullptr) {
+            FATAL("p_notifier is nullptr", "");
+            return false;
+        }
+        indexupdators.push_back(p_notifier);
+        return true;
+    }
+
     bool insert(const row_t& tuple) {
         try {
             database[tuple.primary_key()] = tuple;
@@ -46,5 +57,7 @@ public:
     }
 private:
     std::unordered_map<primary_key_t, row_t> database;
+private:
+    std::list<indexupdator_t> indexupdators;
 };
 }

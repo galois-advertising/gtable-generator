@@ -10,10 +10,10 @@ namespace galois::gtable {
 template <typename traits>
 class iindexupdator {
 public:
-    using row_t = traits::row_t;
-    bool notify_after_insert(const row_t& tuple) = 0;
-    bool notify_before_delete(const row_t& tuple) = 0;
+    using row_t = typename traits::row_t;
+    virtual bool notify_after_insert(const row_t& row) = 0;
+    virtual bool notify_before_delete(const row_t& row) = 0;
     virtual ~iindexupdator() {};
-}
+};
 
 };

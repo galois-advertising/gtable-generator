@@ -21,6 +21,10 @@ int gtable_project::initialize() {
         FATAL("Failed to setup_dataupdator", "");
         return -1;
     }
+    if (!setup_indexupdator()) {
+        FATAL("Failed to setup_indexupdator", "");
+        return -1;
+    }
     return 0;
 }
 

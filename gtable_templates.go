@@ -139,6 +139,23 @@ func (gt *GtableTemplates) generate_dataupdator(out_path string, du *Dataupdator
 	}
 }
 
+func (gt *GtableTemplates) generate_indexupdator(out_path string, iu *Indexupdator) {
+	log.Printf("Processing %s", iu.Name)
+	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, iu.Name))
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer h_file.Close()
+	if tmpl, ok := gt.tmpls["indexupdator_h.t"]; ok {
+		if err := tmpl.Execute(h_file, iu); err != nil {
+			panic(err.Error())
+		}
+	} else {
+		panic(fmt.Sprintf("Cannot find .h template for indexupdator"))
+	}
+}
+
 func (gt *GtableTemplates) generate_indextable(out_path string, it *Indextable) {
 	log.Printf("Processing %s", it.Name)
 	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, it.Name))
@@ -184,6 +201,8 @@ func (gt *GtableTemplates) Generate(out_path string, data interface{}) {
 		gt.generate_datasource(out_path, data.(*Datasource))
 	case *Dataupdator:
 		gt.generate_dataupdator(out_path, data.(*Dataupdator))
+	case *Indexupdator:
+		gt.generate_indexupdator(out_path, data.(*Indexupdator))
 	case *Indextable:
 		gt.generate_indextable(out_path, data.(*Indextable))
 	case *Project:

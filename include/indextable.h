@@ -17,6 +17,7 @@ public:
     using index_key = typename traits::index_key;
     using index_ref = const row_t*;
     using primary_key_t = typename traits::primary_key_t;
+    using iindextable_t = iindextable<traits>;
     using index_t = std::unordered_map<index_key, std::unordered_map<primary_key_t, index_ref>>;
 
 private:

@@ -27,6 +27,7 @@ public:
     virtual ~gtable_project();
     int initialize();
     virtual bool setup_dataupdator() = 0;
+    virtual bool setup_indexupdator() = 0;
     virtual _datasources_t& _mutable_datasources() = 0;
     int load_base();
     int reload();

@@ -61,7 +61,7 @@ func (d *Project) build_dataview() error {
 		if idv, ok := _m[du.From]; ok {
 			d.Dataviews[idv].Dataupdators =
 				append(d.Dataviews[idv].Dataupdators, &d.Dataupdators[idu])
-			log.Printf("link [%s] -> [%s]", du.Name, d.Dataviews[idv].Name)
+			log.Printf("link [%s] -> [%s]", d.Dataviews[idv].Name, du.Name)
 		} else {
 			log.Fatalf("dataupdator [%s]->[%s] : from not found", du.From, du.To)
 		}
@@ -70,7 +70,9 @@ func (d *Project) build_dataview() error {
 }
 
 func (d *Project) build_datatable() error {
-	for idt, _ := range d.Datatables {
+	_m := make(map[string]uint32)
+	for idt, dt := range d.Datatables {
+		_m[dt.Name] = uint32(idt)
 		for icol, col := range d.Datatables[idt].Columns {
 			d.Datatables[idt].Columns[icol].IsPrimarykey = false
 			for _, pk := range d.Datatables[idt].Primary_key.Keys {
@@ -78,6 +80,15 @@ func (d *Project) build_datatable() error {
 					d.Datatables[idt].Columns[icol].IsPrimarykey = true
 				}
 			}
+		}
+	}
+	for iiu, iu := range d.Indexupdators {
+		if idt, ok := _m[iu.From]; ok {
+			d.Datatables[idt].Indexupdators =
+				append(d.Datatables[idt].Indexupdators, &d.Indexupdators[iiu])
+			log.Printf("link [%s] -> [%s]", d.Datatables[idt].Name, iu.Name)
+		} else {
+			log.Fatalf("indexupdator [%s]->[%s] : from not found", iu.From, iu.To)
 		}
 	}
 	return nil
@@ -113,6 +124,25 @@ func (d *Project) build_dataupdator() error {
 			}
 		} else {
 			msg := fmt.Sprintf("Cannot find the datatable of \"%s\":[%s]", du.Name, du.From)
+			log.Fatal(msg)
+			return errors.New(msg)
+		}
+	}
+
+	return nil
+}
+
+func (d *Project) build_indexupdator() error {
+	_m_datatable := make(map[string]uint32)
+	for idx, dt := range d.Datatables {
+		_m_datatable[dt.Name] = uint32(idx)
+	}
+	for idx, it := range d.Indexupdators {
+		log.Printf("Setting %s", it.Name)
+		if ifrom, ok := _m_datatable[it.From]; ok {
+			d.Indexupdators[idx].From_datatable = &d.Datatables[ifrom]
+		} else {
+			msg := fmt.Sprintf("Cannot find the datatable of \"%s\":[%s]", it.Name, it.From)
 			log.Fatal(msg)
 			return errors.New(msg)
 		}
@@ -291,6 +321,11 @@ func (d *Project) LoadDDL(ddl_path string) error {
 		log.Fatal(errs)
 		return errors.New(errs)
 	}
+	if err := d.build_indexupdator(); err != nil {
+		errs := fmt.Sprintf("Build indexupdator fail for %s", err.Error())
+		log.Fatal(errs)
+		return errors.New(errs)
+	}
 	if err := d.check_and_set_namespace(); err != nil {
 		return err
 	}
@@ -322,6 +357,9 @@ func (d *Project) Generate(templates_path string, out_path string) error {
 		}
 		for _, du := range d.Dataupdators {
 			tmps.Generate(out_path, &du)
+		}
+		for _, iu := range d.Indexupdators {
+			tmps.Generate(out_path, &iu)
 		}
 		for _, dt := range d.Datatables {
 			tmps.Generate(out_path, &dt)

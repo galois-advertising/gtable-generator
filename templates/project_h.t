@@ -29,12 +29,11 @@ solopointer1202@gmail.com
 {{ range .Dataupdators -}}
 #include "{{.Name -}}.h"
 {{ end -}}
-/*
 // Indexupdator
 {{ range .Indexupdators -}}
 #include "{{.Name -}}.h"
 {{ end }}
-*/
+
 namespace {{ .Namespace }} {
 
 class {{ .Handler }}: public galois::gtable::gtable_project {
@@ -65,18 +64,28 @@ private:
     {{ range .Dataupdators -}}
     DEFINE_HANDLER({{- .Name -}}_dataupdator, {{ .Name -}}_var);
     {{ end -}}
-/*    
     // Indexupdator
     {{ range .Indexupdators -}}
     DEFINE_HANDLER({{- .Name -}}_indexupdator, {{ .Name -}}_var);
     {{ end -}}
-*/
+
     bool setup_dataupdator() {
         {{ range $idv, $dv := .Dataviews -}}
-        {{ range $idp, $du := $dv.Dataupdators -}}
+        {{ range $idu, $du := $dv.Dataupdators -}}
         {{ $du.Name -}}_var().set_datatable(&{{ .To -}}_var()); 
         {{ $dv.Name -}}_var().append_dataupdator(
             dynamic_cast<std::remove_reference<decltype({{- $dv.Name -}}_var())>::type::dataupdator_t>(&{{ $du.Name -}}_var()));
+        {{ end -}}
+        {{ end -}}
+        return true;
+    }
+
+    bool setup_indexupdator() {
+        {{ range $idt, $dt := .Datatables -}}
+        {{ range $iiu, $iu := $dt.Indexupdators -}}
+        {{ $iu.Name -}}_var().set_indextable(&{{ .To -}}_var()); 
+        {{ $dt.Name -}}_var().append_indexupdator(
+            dynamic_cast<std::remove_reference<decltype({{- $dt.Name -}}_var())>::type::indexupdator_t>(&{{ $iu.Name -}}_var()));
         {{ end -}}
         {{ end -}}
         return true;

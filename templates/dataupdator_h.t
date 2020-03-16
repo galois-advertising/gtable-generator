@@ -19,7 +19,7 @@ public:
     using update_raw_t = typename dataview_traits::update_raw_t;
     using update_derivative_t = typename dataview_traits::update_derivative_t;
     using delete_key_t = typename dataview_traits::delete_key_t;
-    using data_table = {{ .To }}_datatable;
+    using data_table = {{ .To -}}_datatable;
 
     static bool create_row_tuple(const insert_raw_t&, const insert_derivative_t&, data_table::row_t&);
     static bool make_primary_key(const insert_raw_t&, const insert_derivative_t&, data_table::primary_key_t& pk);

@@ -8,13 +8,14 @@ import (
 )
 
 type Datatable struct {
-	Name        string     `xml:"name"`
-	Columns     []Column   `xml:"columns_node>column_node"`
-	Primary_key Primarykey `xml:"primary_key"`
-	Notations   []string   `xml:"notations>notation"`
-	Namespace   string
-	Handler     string
-	Cppcode     string
+	Name          string     `xml:"name"`
+	Columns       []Column   `xml:"columns_node>column_node"`
+	Primary_key   Primarykey `xml:"primary_key"`
+	Notations     []string   `xml:"notations>notation"`
+	Namespace     string
+	Handler       string
+	Cppcode       string
+	Indexupdators []*Indexupdator
 }
 
 type Primarykey struct {
@@ -52,6 +53,7 @@ func (d *Datatable) SetCppcode(_cpp string) {
 }
 
 func (d *Datatable) Setup() error {
+	d.Indexupdators = make([]*Indexupdator, 0, 0)
 	d.Primary_key.Keys = strings.Split(d.Primary_key.Text, ",")
 	return nil
 }

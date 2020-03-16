@@ -8,14 +8,16 @@ import (
 )
 
 type Indexupdator struct {
-	Name       string     `xml:"name"`
-	From       string     `xml:"from"`
-	To         string     `xml:"to"`
-	Properties []Property `xml:"property"`
-	Notations  []string   `xml:"notations>notation"`
-	Namespace  string
-	Handler    string
-	Cppcode    string
+	Name           string     `xml:"name"`
+	From           string     `xml:"from"`
+	To             string     `xml:"to"`
+	Properties     []Property `xml:"property"`
+	Notations      []string   `xml:"notations>notation"`
+	From_datatable *Datatable
+	To_indextable  *Indextable
+	Namespace      string
+	Handler        string
+	Cppcode        string
 }
 
 func (d *Indexupdator) Get_type() (string, error) {
