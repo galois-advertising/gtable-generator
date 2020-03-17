@@ -35,7 +35,6 @@ public:
     }
 
     bool notify_insert(const insert_raw_t& raw, const insert_derivative_t& derivative) {
-        DEBUG("begin notify_insert.", "");
         for (auto du : dataupdators) {
             if (!du->notify_insert(raw, derivative)) {
                 FATAL("notify_insert fail.", "");

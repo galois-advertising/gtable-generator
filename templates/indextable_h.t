@@ -14,6 +14,10 @@ public:
     using row_t = typename datatable_traits::row_t;
     using index_key = {{ .KeyType }};
     using primary_key_t = typename datatable_traits::primary_key_t;
+    template <typename t>
+    static primary_key_t primary_key(const t& row_or_key) {
+        return datatable_traits::primary_key(row_or_key);
+    }
     static const index_key& make_index_key(const row_t& row) {
         return row.{{ .OnColumn }}();
     }

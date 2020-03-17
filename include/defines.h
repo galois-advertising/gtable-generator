@@ -28,6 +28,7 @@ solopointer1202@gmail.com
     const std::vector<type> & name() const {return _##name;}\
     bool append_##name(const type& item) { _##name.push_back(item); _is_set_##name = true; return true;}\
     bool clear_##name() { _##name.clear(); _is_set_##name = true; return true;}\
+    void set_##name(const std::vector<type>& _v) {_##name = _v; _is_set_##name = true;}\
     bool is_set_##name() const {return _is_set_##name;}
 
 

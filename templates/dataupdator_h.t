@@ -20,9 +20,16 @@ public:
     using update_derivative_t = typename dataview_traits::update_derivative_t;
     using delete_key_t = typename dataview_traits::delete_key_t;
     using data_table = {{ .To -}}_datatable;
+    using row_t = typename data_table::row_t;
 
     static bool create_row_tuple(const insert_raw_t&, const insert_derivative_t&, data_table::row_t&);
-    static bool make_primary_key(const insert_raw_t&, const insert_derivative_t&, data_table::primary_key_t& pk);
+    template <typename t>
+    static data_table::primary_key_t primary_key(const t& row_or_key) {
+        return data_table::primary_key(row_or_key);
+    }
+    static bool update(const row_t& new_tuple, row_t& old_tuple) {
+
+    }
 };
 
 template <typename dataview_traits>
@@ -48,13 +55,6 @@ bool {{ .Name -}}_traits<dataview_traits>::create_row_tuple(const insert_raw_t& 
     }
         {{- end }}
     {{- end }}
-    return true;
-}
-
-template <typename dataview_traits>
-bool {{ .Name -}}_traits<dataview_traits>::make_primary_key(const insert_raw_t&, 
-    const insert_derivative_t&, 
-    data_table::primary_key_t& pk) {
     return true;
 }
 

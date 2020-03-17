@@ -29,13 +29,22 @@ public:
                 FATAL("notify_after_insert fail", "");
                 return false;
             }
+        } else {
+            FATAL("_indextable is nullptr when notify_after_insert", "");
+            return false;
         }
         return true;
     };
 
     bool notify_before_delete(const row_t& row) {
         if (_indextable) {
-           //_indextable->
+           if (!_indextable->before_delete(row)) {
+                FATAL("notify_after_insert fail", "");
+                return false;
+           }
+        } else {
+            FATAL("_indextable is nullptr when notify_before_delete", "");
+            return false;
         }
         return true;
     };

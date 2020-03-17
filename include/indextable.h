@@ -5,6 +5,7 @@ solopointer1202@gmail.com
 #pragma once
 #include <unordered_map>
 #include <set>
+#include <sstream>
 #include "iindextable.h"
 #include "log.h"
 
@@ -26,11 +27,16 @@ public:
     bool after_insert(const row_t& tuple) {
         try {
             auto k = traits::make_index_key(tuple);
-            auto pk = tuple.primary_key();
+            auto pk = traits::primary_key(tuple);
             if (auto pos = indextable.find(k); pos == indextable.end()) {
                 indextable[k] = {};
             }
             indextable[k][pk] = dynamic_cast<index_ref>(&tuple);
+#ifdef _DEBUG
+            std::stringstream ss;
+            ss << "key:"<<k<<" pk:"<<pk<<" data:"<<tuple;
+            DEBUG("Insert Indextable: %s", ss.str().c_str());
+#endif
             return true;
         } catch (std::bad_alloc& ) {
             FATAL("Out of memory when after_inseert new index", "");

@@ -20,6 +20,7 @@ public:
     // from dataupdator_traits
     using data_table = typename dataupdator_traits<dataview_traits>::data_table;
     using idatatable_t = typename data_table::idatatable_t;
+    using primary_key_t = typename data_table::primary_key_t;
 
 private: 
     idatatable_t * _datatable = nullptr;
@@ -32,7 +33,7 @@ protected:
         typename data_table::row_t row;
         if (dataupdator_traits<dataview_traits>::create_row_tuple(original, derivative, row)) {
             if (_datatable) {
-                return this->_datatable->insert(row);
+                return this->_datatable->on_insert(row);
             } else {
                 FATAL("_datatable is nill.", "");
                 return false;
@@ -44,29 +45,31 @@ protected:
         return true;
 
     }
-    bool notify_update(const update_raw_t&, const update_derivative_t&) {
-        //typename TDataTable::TPrimaryKey pk;
-        //if (0 != traits::make_primary_key(portal_tuple, &pk)) {
-        //    FATAL("Make primary key failed.", "");
-        //    this->_old_iter.reset();
-        //    reset_old_data_tag();
-        //    return false;
-        //}
-        //this->_old_iter = this->_p_data_table->seek(pk);
-        //set_old_data_tag(portal_tuple);
-        //return true;
-        return false;
 
+    bool notify_update(const update_raw_t& original, const update_derivative_t& derivative) {
+        typename data_table::row_t update_info;
+        if (dataupdator_traits<dataview_traits>::create_row_tuple(original, derivative, update_info)) {
+            if (_datatable) {
+                primary_key_t pk = dataupdator_traits<dataview_traits>::primary_key(update_info);
+                auto old_row_p = _datatable->find(pk);
+                if (old_row_p != nullptr) {
+                    return this->_datatable->on_update(*old_row_p);
+                } else {
+                    FATAL("Try to update a none-exists row", "");
+                    return false;
+                }
+            } else {
+                FATAL("Should not be here, _datatable is nullptr", "");
+            }
+        } else {
+            FATAL("create_row_tuple fail.", "");
+        }
+        return false;
     }
-    bool notify_remove(const delete_key_t&) {
-        //typename TDataTable::TPrimaryKey pk;
-        //if (0 != traits::make_primary_key(portal_tuple, &pk)) {
-        //    FATAL("Make primary key failed.", "");
-        //    return false;
-        //}
-        //return this->_p_data_table->remove(pk);
-        return false;
 
+    bool notify_remove(const delete_key_t& delete_key) {
+        primary_key_t pk = dataupdator_traits<dataview_traits>::primary_key(delete_key);
+        return this->_datatable->on_remove(pk);
     }
 };
 

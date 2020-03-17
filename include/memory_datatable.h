@@ -20,6 +20,15 @@ public:
     using idatatable_t = idatatable<traits>;
     using indexupdator_t = iindexupdator<traits>*;
 
+    template <typename t>
+    static primary_key_t primary_key(const t& row_or_key) {
+        return traits::primary_key(row_or_key);
+    }
+
+    static bool merge_row(const row_t& new_tuple, row_t& old_tuple) {
+        return traits::merge_row(new_tuple, old_tuple);
+    }
+
     bool append_indexupdator(indexupdator_t p_notifier) {
         if (p_notifier == nullptr) {
             FATAL("p_notifier is nullptr", "");
@@ -29,31 +38,54 @@ public:
         return true;
     }
 
-    bool insert(const row_t& tuple) {
+    bool on_insert(const row_t& tuple) {
         try {
-            database[tuple.primary_key()] = tuple;
+            database[traits::primary_key(tuple)] = tuple;
+#ifdef _DEBUG
+        std::stringstream ss;
+        ss << tuple;
+        DEBUG("Insert datatable: %s", ss.str().c_str());
+#endif
+            for (auto &du : indexupdators) {
+                if (!du->notify_after_insert(tuple)) {
+                    FATAL("notify_after_insert failed.", "");
+                }
+            }
         } catch (std::bad_alloc & ) {
             FATAL("Out of memory when inserting new row", "");
         } catch (...) {
             FATAL("Unknown error when inserting new row", "");
         }
-#ifdef _DEBUG
-        std::stringstream ss;
-        ss << tuple;
-        DEBUG("Insert->%s", ss.str().c_str());
-#endif
         return true;
     }
-    bool update(const row_t& tuple, row_t& old) {
-        if (auto pos = database.find(tuple.primary_key()); pos != database.end()) {
-            return traits::update(tuple, pos->second);
-        } else {
-            return false;
+
+    bool on_update(const row_t& tuple) {
+        auto pk = traits::primary_key(tuple);
+        if (auto pos = database.find(pk); pos != database.end()) {
+            merge_row(tuple, pos->second);
+            on_remove(pk);
+            on_insert(tuple);
+        } 
+        return false;
+    }
+
+    bool on_remove(const primary_key_t&pk) {
+        if (auto pos = database.find(pk); pos != database.end()) {
+            for (auto &du : indexupdators) {
+                if (!du->notify_before_delete(pos->second)) {
+                    FATAL("notify_before_delete failed.", "");
+                }
+            }
+            database.erase(pos);
         }
-    }
-    bool del(const primary_key_t&pk) {
-        database.erase(pk);
         return true;
+    }
+
+    const row_t* find(const primary_key_t& pk) {
+        if (auto pos = database.find(pk); pos != database.end()) {
+            return &pos->second;
+        }
+        return nullptr;
     }
 private:
     std::unordered_map<primary_key_t, row_t> database;
