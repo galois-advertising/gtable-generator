@@ -1,4 +1,4 @@
-package main
+package generator
 
 type errorString struct {
 	s string

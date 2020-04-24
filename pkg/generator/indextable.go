@@ -1,5 +1,5 @@
 // solopointer1202@gmail.com
-package main
+package generator
 
 type Indextable struct {
 	Name      string   `xml:"name"`

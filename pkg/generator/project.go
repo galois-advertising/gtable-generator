@@ -1,5 +1,5 @@
 //solopointer1202@gmail.com
-package main
+package generator 
 
 import (
 	"encoding/xml"
@@ -19,6 +19,7 @@ type Project struct {
 	Datatables    []Datatable
 	Indexupdators []Indexupdator
 	Indextables   []Indextable
+	Queries       []Query
 	Namespace     string
 	Handler       string
 }
@@ -264,7 +265,7 @@ func (d *Project) LoadDDL(ddl_path string) error {
 				return err
 			}
 			if !f.IsDir() && strings.HasSuffix(path, ".ddl.xml") {
-				log.Printf("Processing: %s", path)
+				log.Printf("Loading [%s]", path)
 				r, err := ioutil.ReadFile(path)
 				if err != nil {
 					return err
@@ -336,6 +337,38 @@ func (d *Project) LoadDDL(ddl_path string) error {
 	return nil
 }
 
+func (d *Project) LoadGQL(gql_path string) error {
+	if !DirExists(gql_path) {
+		errs := fmt.Sprintf("%s not exists or not a directory.", gql_path)
+		log.Fatal(errs)
+		return errors.New(errs)
+	}
+	filepath.Walk(gql_path,
+		func(path string, f os.FileInfo, err error) error {
+			if f == nil {
+				return err
+			}
+			if !f.IsDir() && strings.HasSuffix(path, ".gql.xml") {
+				log.Printf("Loading [%s]", path)
+				r, err := ioutil.ReadFile(path)
+				if err != nil {
+					return err
+				}
+				var gql GqlDefines
+				if err := xml.Unmarshal(r, &gql); err != nil {
+					log.Fatal(err)
+				} else {
+					gql.Setup()
+					for _, query := range gql.Queries {
+						d.Queries = append(d.Queries, query)
+					}
+				}
+			}
+			return nil
+		})
+	return nil
+}
+
 func (d *Project) Generate(templates_path string, out_path string) error {
 	if !DirExists(templates_path) {
 		errs := fmt.Sprintf("Template path [%s] not exists or not a directory.", templates_path)
@@ -366,6 +399,9 @@ func (d *Project) Generate(templates_path string, out_path string) error {
 		}
 		for _, it := range d.Indextables {
 			tmps.Generate(out_path, &it)
+		}
+		for _, qy := range d.Queries {
+			tmps.Generate(out_path, &qy)
 		}
 	}
 	tmps.generate_project(out_path, d)

@@ -1,4 +1,4 @@
-package main
+package main 
 
 import (
 	"flag"
@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"github.com/galois-advertising/gtable-generator/pkg/generator"
 )
 
 func usage() {
@@ -16,10 +17,11 @@ func usage() {
 }
 
 var (
-	help          bool
-	template_path string
-	input_path    string
-	output_path   string
+	help           bool
+	template_path  string
+	ddl_input_path string
+	gql_input_path string
+	output_path    string
 )
 
 func init() {
@@ -31,7 +33,8 @@ func init() {
 	default_template_path = path.Join(filepath.Dir(ex), "gtable-generator-templates")
 	flag.BoolVar(&help, "h", false, "Show this help message")
 	flag.StringVar(&template_path, "t", default_template_path, "Specify template path")
-	flag.StringVar(&input_path, "i", "", "Specify the path of *.ddl.xml files")
+	flag.StringVar(&ddl_input_path, "ddl", "", "Specify the path of *.ddl.xml files")
+	flag.StringVar(&gql_input_path, "gql", "", "Specify the path of *.gql.xml files")
 	flag.StringVar(&output_path, "o", "./", "Specify output path")
 	flag.Usage = usage
 }
@@ -53,22 +56,31 @@ func main() {
 		flag.Usage()
 		return
 	}
-	if !DirExists(template_path) {
+	if !generator.DirExists(template_path) {
 		log.Fatalf("Template path [%s] does not exists.", template_path)
 		return
 	}
-	if !DirExists(input_path) {
-		log.Fatalf("*.ddl.xml path [%s] does not exists.", input_path)
+	if !generator.DirExists(ddl_input_path) {
+		log.Fatalf("*.ddl.xml path [%s] does not exists.", ddl_input_path)
 		return
 	}
-	if !DirExists(output_path) {
+	if !generator.DirExists(output_path) {
 		log.Fatalf("Output path [%s] does not exists.", output_path)
 		return
 	}
-	var p Project
+	var p generator.Project
 	p.Init()
-	if err := p.LoadDDL(input_path); err != nil {
+	if err := p.LoadDDL(ddl_input_path); err != nil {
 		return
+	}
+	if len(gql_input_path) != 0 {
+		if generator.DirExists(gql_input_path) {
+			if err := p.LoadGQL(gql_input_path); err != nil {
+				log.Fatalf("load gql fail for [%s]", err)
+			}
+		} else {
+			log.Fatalf("gql input path [%s] does not exists.", gql_input_path)
+		}
 	}
 	p.Stat()
 	if err := ensure_dir(path.Join(output_path, "gtable")); err != nil {
@@ -101,7 +113,7 @@ func main() {
 		}
 		log.Printf(gtable_file)
 		if !f.IsDir() {
-			Cp(gtable_file, path.Join(output_path, "gtable", filepath.Base(gtable_file)))
+			generator.Cp(gtable_file, path.Join(output_path, "gtable", filepath.Base(gtable_file)))
 		}
 		return nil
 	}

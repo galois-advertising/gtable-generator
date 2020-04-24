@@ -1,6 +1,6 @@
 // solopointer1202@gmail.com
 // 20200109
-package main
+package generator 
 
 import (
 	"fmt"

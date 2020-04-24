@@ -1,5 +1,5 @@
 //solopointer1202@gmail.com
-package main
+package generator
 
 import (
 	"encoding/xml"
@@ -8,19 +8,20 @@ import (
 	"testing"
 )
 
-func TestIndexupdator(t *testing.T) {
+func TestDataupdator(t *testing.T) {
 	blob := `
-	<indexupdator>
-    <name>user_table|user_index</name>
-    <from>user_table</from>
-    <to>user_index</to>
+	<dataupdator>
+    <name>plan_view|plan_table</name>
+    <from>plan_view</from>
+    <to>plan_table</to>
     <properties>
+      <udf>plan_view_to_plan_table</udf>
       <type>NOT DEFAULT</type>
     </properties>
     <notations/>
-  </indexupdator>
+  </dataupdator>
 	`
-	var d Indexupdator
+	var d Dataupdator
 	if err := xml.Unmarshal([]byte(blob), &d); err != nil {
 		log.Fatalf("Error:%s", err.Error())
 	} else {

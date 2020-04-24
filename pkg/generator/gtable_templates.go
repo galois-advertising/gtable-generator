@@ -1,4 +1,4 @@
-package main
+package generator
 
 import (
 	"errors"
@@ -60,7 +60,7 @@ func (gt *GtableTemplates) generate_dataview(out_path string, dv *Dataview) {
 }
 
 func (gt *GtableTemplates) generate_datatable(out_path string, dt *Datatable) {
-	log.Printf("Processing %s", dt.Name)
+	log.Printf("Generating %s", dt.Name)
 	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, dt.Name))
 	if err != nil {
 		log.Fatal(err)
@@ -82,7 +82,7 @@ func (gt *GtableTemplates) generate_datatable(out_path string, dt *Datatable) {
 }
 
 func (gt *GtableTemplates) generate_datasource_databus(out_path string, ds *Datasource) {
-	log.Printf("Processing %s", ds.Name)
+	log.Printf("Generating %s", ds.Name)
 	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, ds.Name))
 	if err != nil {
 		log.Fatal(err)
@@ -111,8 +111,12 @@ func (gt *GtableTemplates) generate_datasource_databus(out_path string, ds *Data
 }
 
 func (gt *GtableTemplates) generate_datasource(out_path string, ds *Datasource) {
+	log.Print(ds)
 	dtype, err := ds.Get_type()
-	log.Printf(dtype)
+	if err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
 	if err == nil {
 		switch dtype {
 		case "databus":
@@ -123,7 +127,7 @@ func (gt *GtableTemplates) generate_datasource(out_path string, ds *Datasource) 
 }
 
 func (gt *GtableTemplates) generate_dataupdator(out_path string, du *Dataupdator) {
-	log.Printf("Processing %s", du.Name)
+	log.Printf("Generating %s", du.Name)
 	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, du.Name))
 	if err != nil {
 		log.Fatal(err)
@@ -140,7 +144,7 @@ func (gt *GtableTemplates) generate_dataupdator(out_path string, du *Dataupdator
 }
 
 func (gt *GtableTemplates) generate_indexupdator(out_path string, iu *Indexupdator) {
-	log.Printf("Processing %s", iu.Name)
+	log.Printf("Generating %s", iu.Name)
 	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, iu.Name))
 	if err != nil {
 		log.Fatal(err)
@@ -157,7 +161,7 @@ func (gt *GtableTemplates) generate_indexupdator(out_path string, iu *Indexupdat
 }
 
 func (gt *GtableTemplates) generate_indextable(out_path string, it *Indextable) {
-	log.Printf("Processing %s", it.Name)
+	log.Printf("Generating %s", it.Name)
 	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, it.Name))
 	if err != nil {
 		log.Fatal(err)
@@ -171,6 +175,10 @@ func (gt *GtableTemplates) generate_indextable(out_path string, it *Indextable) 
 	} else {
 		panic(fmt.Sprintf("Cannot find .h template for indextable"))
 	}
+}
+
+func (gt *GtableTemplates) generate_query(out_path string, qy *Query) {
+	log.Printf("Generating %s", qy.Name)
 }
 
 func (gt *GtableTemplates) generate_project(out_path string, p *Project) error {
@@ -205,6 +213,8 @@ func (gt *GtableTemplates) Generate(out_path string, data interface{}) {
 		gt.generate_indexupdator(out_path, data.(*Indexupdator))
 	case *Indextable:
 		gt.generate_indextable(out_path, data.(*Indextable))
+	case *Query:
+		gt.generate_query(out_path, data.(*Query))
 	case *Project:
 		gt.generate_project(out_path, data.(*Project))
 	default:
