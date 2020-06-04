@@ -10,20 +10,19 @@ gtable-generator is a tool for translating *.ddl.xml file inito *.h/*.cpp file.
 # install
 
 Installation dependency:
-* go1.12.9+
+* go1.14+
 
 ```
-$ go build -o gtable-generator *.go
-$ cp gtable-generator /usr/local/bin
-$ rm -rf /usr/local/bin/gtable-generator-include
-$ cp -r include /usr/local/bin/gtable-generator-include
-$ rm -rf /usr/local/bin/gtable-generator-src
-$ cp -r src /usr/local/bin/gtable-generator-src
-$ rm -rf /usr/local/bin/gtable-generator-templates
-$ cp -r templates /usr/local/bin/gtable-generator-templates
+$ go get github.com/galois-advertising/gtable-generator
 ```
 
 # usage
+
+First, you should use `gtable-parser` to parse `Data Definition Language` file (*.ddl) to xml file just like:
+
+```
+$ python ddl2xml.py user.ddl /path/to/user.ddl.xml
+```
 
 ```
 $ gtable-generator -i /path/to/*.ddl.xml -o /path/to/output
