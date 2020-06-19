@@ -1,4 +1,4 @@
-package main 
+package main
 
 import (
 	"flag"
@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+
 	"github.com/galois-advertising/gtable-generator/pkg/generator"
 )
 
@@ -30,8 +31,8 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	default_template_path = path.Join(filepath.Dir(ex), 
-	    "../src/github.com/galois-advertising/gtable-generator/gtable-generator-templates")
+	default_template_path = path.Join(filepath.Dir(ex),
+		"../src/github.com/galois-advertising/gtable-generator/gtable-generator-templates")
 	flag.BoolVar(&help, "h", false, "Show this help message")
 	flag.StringVar(&template_path, "t", default_template_path, "Specify template path")
 	flag.StringVar(&ddl_input_path, "ddl", "", "Specify the path of *.ddl.xml files")
@@ -41,9 +42,7 @@ func init() {
 }
 
 func ensure_dir(dir string) error {
-
 	err := os.Mkdir(dir, os.ModeDir)
-
 	if err == nil || os.IsExist(err) {
 		return nil
 	} else {
@@ -118,11 +117,11 @@ func main() {
 		}
 		return nil
 	}
-	gtable_include := path.Join(filepath.Dir(ex), 
-	    "../src/github.com/galois-advertising/gtable-generator/gtable-generator-include")
+	gtable_include := path.Join(filepath.Dir(ex),
+		"../src/github.com/galois-advertising/gtable-generator/gtable-generator-include")
 	filepath.Walk(gtable_include, cp)
-	gtable_src := path.Join(filepath.Dir(ex), 
-	    "../src/github.com/galois-advertising/gtable-generator/gtable-generator-src")
+	gtable_src := path.Join(filepath.Dir(ex),
+		"../src/github.com/galois-advertising/gtable-generator/gtable-generator-src")
 	filepath.Walk(gtable_src, cp)
 	log.Println("Generate succeed.")
 }
