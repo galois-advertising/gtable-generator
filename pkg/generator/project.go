@@ -1,5 +1,5 @@
 //solopointer1202@gmail.com
-package generator 
+package generator
 
 import (
 	"encoding/xml"
@@ -20,6 +20,7 @@ type Project struct {
 	Indexupdators []Indexupdator
 	Indextables   []Indextable
 	Queries       []Query
+	ValueGetters  []ValueGetter
 	Namespace     string
 	Handler       string
 }
@@ -191,6 +192,7 @@ func (d *Project) Init() {
 	d.Datatables = []Datatable{}
 	d.Indexupdators = []Indexupdator{}
 	d.Indextables = []Indextable{}
+	d.ValueGetters = []ValueGetter{}
 }
 
 func (d *Project) check_and_set_handler() error {
@@ -362,6 +364,7 @@ func (d *Project) LoadGQL(gql_path string) error {
 					for _, query := range gql.Queries {
 						d.Queries = append(d.Queries, query)
 					}
+					// set ValueGetters
 				}
 			}
 			return nil
@@ -402,6 +405,9 @@ func (d *Project) Generate(templates_path string, out_path string) error {
 		}
 		for _, qy := range d.Queries {
 			tmps.Generate(out_path, &qy)
+		}
+		for _, vg := range d.ValueGetters {
+			tmps.Generate(out_path, &vg)
 		}
 	}
 	tmps.generate_project(out_path, d)

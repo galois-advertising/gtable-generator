@@ -7,9 +7,7 @@ namespace galois::gtable {
 template <class TMessenger>
 class value_getter {
 public:
-    virtual ~value_getter() {
-    }
-
+    virtual ~value_getter() = 0;
     virtual const char* name() const = 0;
     virtual void* get_value(TMessenger* msgr) const = 0;
     virtual const bool is_enumerate() const = 0;
@@ -28,8 +26,8 @@ public:
     }
 
     void* get_value(TMessenger* msgr) const {
-        if (msgr == NULL) {
-            return NULL;
+        if (msgr == nullptr) {
+            return nullptr;
         }
         return get_field_value(&msgr->table_iters);
     }
@@ -54,12 +52,9 @@ protected:
 template <class TMessenger>
 class placeholder_getter : public value_getter<TMessenger> {
 protected:
-    virtual void* get_param_value(TQueryData* query_data) const = 0;
-protected:
     mutable int _param_pos;
 public:
     typedef typename TMessenger::TQueryData TQueryData;
-public:
     placeholder_getter(): _param_pos(0) {
     }
 
@@ -71,10 +66,10 @@ public:
     }
 
     void* get_value(TMessenger* msgr) const {
-        if (msgr == NULL) {
-            return NULL;
+        if (msgr) {
+            return get_param_value(&msgr->query_data);
         }
-        return get_param_value(&msgr->query_data);
+        return nullptr;
     }
 
     const bool is_enumerate() const {
@@ -90,6 +85,8 @@ public:
 
     void reset() {
     }
+protected:
+    virtual void* get_param_value(TQueryData* query_data) const = 0;
 };
 
 template <class TMessenger>
@@ -118,8 +115,8 @@ public:
 
     void* get_value(TMessenger* msgr) const
     {
-        if (msgr == NULL) {
-            return NULL;
+        if (msgr == nullptr) {
+            return nullptr;
         }
 
         return get_param_value(&msgr->query_data);
@@ -169,7 +166,7 @@ public:
     }
 
     void append_value_getter(value_getter<TMessenger>* value_getter) {
-        if (value_getter == NULL) {
+        if (value_getter == nullptr) {
             return;
         }
         _multi_value_getters.push_back(value_getter);
