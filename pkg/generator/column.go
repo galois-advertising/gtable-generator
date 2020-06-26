@@ -9,12 +9,12 @@ import (
 )
 
 type Column struct {
-	XMLName       xml.Name    `xml:"column_node"`
-	Column_name   string      `xml:"name"`
-	Column_kind   KindAttr    `xml:"kind"`
+	XMLName      xml.Name    `xml:"column_node"`
+	Column_name  string      `xml:"name"`
+	Column_kind  KindAttr    `xml:"kind"`
 	IsDerivative string      `xml:"type,attr"`
-	Constrains    []Constrain `xml:"constrains>constrain"`
-	IsPrimarykey  bool
+	Constrains   []Constrain `xml:"constrains>constrain"`
+	IsPrimarykey bool
 }
 
 type KindAttr struct {

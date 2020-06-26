@@ -1,11 +1,9 @@
 package generator
 
 type FieldCondition struct {
-	Id     string   `xml:"id"`
-	Op     string   `xml:"type"`
-	Fields []string `xml:"field"`
-	Left   Field
-	Right  Field
+	Id     string  `xml:"id"`
+	Op     string  `xml:"type"`
+	Fields []Field `xml:"field"`
 }
 
 func (fc *FieldCondition) Setup() (ok bool) {
