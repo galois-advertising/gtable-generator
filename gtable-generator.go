@@ -60,26 +60,32 @@ func main() {
 		log.Fatalf("Template path [%s] does not exists.", template_path)
 		return
 	}
-	if !generator.DirExists(ddl_input_path) {
+	if ddl_input_path != "" && !generator.DirExists(ddl_input_path) {
 		log.Fatalf("*.ddl.xml path [%s] does not exists.", ddl_input_path)
 		return
 	}
+
+	if gql_input_path != "" && !generator.DirExists(gql_input_path) {
+		log.Fatalf("*.gql.xml path [%s] does not exists.", gql_input_path)
+		return
+	}
+
 	if !generator.DirExists(output_path) {
 		log.Fatalf("Output path [%s] does not exists.", output_path)
 		return
 	}
 	var p generator.Project
 	p.Init()
-	if err := p.LoadDDL(ddl_input_path); err != nil {
-		return
+	if len(ddl_input_path) != 0 {
+		if err := p.LoadDDL(ddl_input_path); err != nil {
+			log.Fatalf("load ddl fail for [%s]", err)
+			return
+		}
 	}
 	if len(gql_input_path) != 0 {
-		if generator.DirExists(gql_input_path) {
-			if err := p.LoadGQL(gql_input_path); err != nil {
-				log.Fatalf("load gql fail for [%s]", err)
-			}
-		} else {
-			log.Fatalf("gql input path [%s] does not exists.", gql_input_path)
+		if err := p.LoadGQL(gql_input_path); err != nil {
+			log.Fatalf("load gql fail for [%s]", err)
+			return
 		}
 	}
 	p.Stat()

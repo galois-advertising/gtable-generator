@@ -4,6 +4,15 @@
 
 namespace galois::gtable {
 
+template <class T>
+class value_getter{};
+
+template <class T>
+class value_getter<std::vector<T>> {
+
+};
+
+
 template <class TMessenger>
 class value_getter {
 public:

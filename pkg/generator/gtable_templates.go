@@ -179,42 +179,25 @@ func (gt *GtableTemplates) generate_indextable(out_path string, it *Indextable) 
 
 func (gt *GtableTemplates) generate_query(out_path string, qy *Query) {
 	log.Printf("Generating %s", qy.Name)
-	for _, fval := range qy.fieldsMap {
-		gt.generate_valuegetter(out_path, fval)
-	}
+	gt.generate_valuegetter(out_path, qy)
 }
 
-func (gt *GtableTemplates) generate_valuegetter(out_path string, f *Field) {
-	log.Printf("Generating %s", f.Name)
-	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, f.Name))
+func (gt *GtableTemplates) generate_valuegetter(out_path string, qy *Query) {
+	log.Printf("Generating valuegetters of %s", qy.Name)
+	h_file, err := os.Create(fmt.Sprintf("%s/include/%s_valuegetters.h", out_path, qy.Name))
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	defer h_file.Close()
-
-	//var tmpl *template.Template
-	//var ok bool
-	//if f.IsPlaceHolder() {
-	//	if f.ParamType == "Int" {
-	//		tmpl, ok = gt.tmpls["placeholder_h.t"]
-	//	} else if f.ParamType == "Array" {
-	//		tmpl, ok = gt.tmpls["arrayplaceholder_h.t"]
-	//	}
-	//} else {
-	//	if f.TableType == "IndexTable" {
-	//		tmpl, ok = gt.tmpls["fieldgetterptr_h.t"]
-	//	} else {
-	//		tmpl, ok = gt.tmpls["fieldgetter_h.t"]
-	//	}
-	//}
-	//if ok {
-	//	if err := tmpl.Execute(h_file, f); err != nil {
-	//		panic(err.Error())
-	//	}
-	//} else {
-	//	panic(fmt.Sprintf("Cannot find .h template for value_getter"))
-	//}
+	tmpl, ok := gt.tmpls["valuegetter_h.t"]
+	if ok {
+		if err := tmpl.Execute(h_file, qy); err != nil {
+			panic(err.Error())
+		}
+	} else {
+		panic(fmt.Sprintf("Cannot find .h template for value_getter"))
+	}
 }
 
 func (gt *GtableTemplates) generate_project(out_path string, p *Project) error {

@@ -360,9 +360,10 @@ func (d *Project) LoadGQL(gql_path string) error {
 				if err := xml.Unmarshal(r, &gql); err != nil {
 					log.Fatal(err)
 				} else {
-					gql.Setup()
-					for _, query := range gql.Queries {
-						d.Queries = append(d.Queries, query)
+					if gql.Setup() {
+						d.Queries = gql.Queries
+					} else {
+						log.Fatal("[gtable] GqlDefines Setup failed.")
 					}
 					// set ValueGetters
 				}
