@@ -2,3 +2,4 @@ build
 *.pyc
 *.ddl.xml
 output
+gtable-generator

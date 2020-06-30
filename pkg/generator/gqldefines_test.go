@@ -10,6 +10,12 @@ import (
 
 func TestSelect(t *testing.T) {
 	blob := `
+  <?xml version="1.0" encoding="UTF-8"?>
+<gql>
+  <parser_build_time>Jun 27 2020 13:41:52</parser_build_time>
+  <handler>demo</handler>
+  <namespace>galois::user</namespace>
+  <parser_build_time>Jun 27 2020 13:41:52</parser_build_time>
   <query>
     <name>SeekIndex</name>
     <select>
@@ -17,25 +23,43 @@ func TestSelect(t *testing.T) {
       <column>AdxTable.usr_id</column>
     </select>
     <from>
-      <table join_type="FIRST" scan_limit="$ScanLimit" result_limit="$limit" each_scan_limit="" each_result_limit="">
+      <table join_type="base">
         <name>Index</name>
+        <scan_limit>$scanlimit</scan_limit>
+        <result_limit>$limit</result_limit>
       </table>
-      <table join_type="join" scan_limit="" each_scan_limit="">
+      <table join_type="join">
         <name>AdxTable</name>
-        <on_column>Index.Adx_id</on_column>
-        <on_column>AdxTable.Adx_id</on_column>
+        <scan_limit>$scanlimit2</scan_limit>
+        <each_scan_limit>$eachscanlimit2</each_scan_limit>
+        <left_on_columns>
+          <field>Index.Adx_id</field>
+        </left_on_columns>
+        <right_on_columns>
+          <field>AdxTable.Adx_id</field>
+        </right_on_columns>
       </table>
-      <table join_type="leftjoin" scan_limit="" each_scan_limit="">
+      <table join_type="leftjoin">
         <name>User</name>
-        <on_column>AdxTable.plan_id</on_column>
-        <on_column>$Version</on_column>
-        <on_column>User.plan_id</on_column>
-        <on_column>User.version</on_column>
+        <scan_limit>$scanlimit3</scan_limit>
+        <left_on_columns>
+          <field>AdxTable.plan_id</field>
+          <field>$Version</field>
+        </left_on_columns>
+        <right_on_columns>
+          <field>User.plan_id</field>
+          <field>User.version</field>
+        </right_on_columns>
       </table>
-      <table join_type="join" scan_limit="" each_scan_limit="">
+      <table join_type="join">
         <name>PlanTable</name>
-        <on_column>AdxTable.plan_id</on_column>
-        <on_column>PlanTable.plan_id</on_column>
+        <scan_limit>$scanlimit4</scan_limit>
+        <left_on_columns>
+          <field>AdxTable.plan_id</field>
+        </left_on_columns>
+        <right_on_columns>
+          <field>PlanTable.plan_id</field>
+        </right_on_columns>
       </table>
     </from>
     <where>
@@ -128,23 +152,35 @@ func TestSelect(t *testing.T) {
       <column>UnitTable.unit_id</column>
     </select>
     <from>
-      <table join_type="FIRST" scan_limit="" result_limit="" each_scan_limit="" each_result_limit="">
+      <table join_type="base">
         <name>AdxTable</name>
       </table>
-      <table join_type="join" scan_limit="" each_scan_limit="">
+      <table join_type="join">
         <name>PlanTable</name>
-        <on_column>AdxTable.plan_id</on_column>
-        <on_column>PlanTable.plan_id</on_column>
+        <left_on_columns>
+          <field>AdxTable.plan_id</field>
+        </left_on_columns>
+        <right_on_columns>
+          <field>PlanTable.plan_id</field>
+        </right_on_columns>
       </table>
-      <table join_type="join" scan_limit="" each_scan_limit="">
+      <table join_type="join">
         <name>UserTable</name>
-        <on_column>AdxTable.usr_id</on_column>
-        <on_column>UserTable.usr_id</on_column>
+        <left_on_columns>
+          <field>AdxTable.usr_id</field>
+        </left_on_columns>
+        <right_on_columns>
+          <field>UserTable.usr_id</field>
+        </right_on_columns>
       </table>
-      <table join_type="join" scan_limit="" each_scan_limit="">
+      <table join_type="join">
         <name>UnitTable</name>
-        <on_column>AdxTable.unit_id</on_column>
-        <on_column>UnitTable.unit_id</on_column>
+        <left_on_columns>
+          <field>AdxTable.unit_id</field>
+        </left_on_columns>
+        <right_on_columns>
+          <field>UnitTable.unit_id</field>
+        </right_on_columns>
       </table>
     </from>
     <where>
@@ -197,14 +233,18 @@ func TestSelect(t *testing.T) {
       </logic_conditioner>
     </where>
   </query>
+</gql>
 	`
-	var ds []Query
+	var ds GqlDefines
 	if err := xml.Unmarshal([]byte(blob), &ds); err != nil {
 		log.Fatalf("Error:%s", err.Error())
 	} else {
-		log.Println(ds)
+		ds.Setup()
 	}
-	for _, d := range ds {
+	fmt.Println(ds.Handler)
+	fmt.Println(ds.Namespace)
+	fmt.Println(ds.ParserBuildTime)
+	for _, d := range ds.Queries {
 
 		fmt.Println(d.Name)
 		fmt.Println("")

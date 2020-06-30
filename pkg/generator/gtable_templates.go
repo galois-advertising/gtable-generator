@@ -179,39 +179,42 @@ func (gt *GtableTemplates) generate_indextable(out_path string, it *Indextable) 
 
 func (gt *GtableTemplates) generate_query(out_path string, qy *Query) {
 	log.Printf("Generating %s", qy.Name)
+	for _, fval := range qy.fieldsMap {
+		gt.generate_valuegetter(out_path, fval)
+	}
 }
 
-func (gt *GtableTemplates) generate_valuegetter(out_path string, vg *ValueGetter) {
-	log.Printf("Generating %s", vg.Name)
-	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, vg.Name))
+func (gt *GtableTemplates) generate_valuegetter(out_path string, f *Field) {
+	log.Printf("Generating %s", f.Name)
+	h_file, err := os.Create(fmt.Sprintf("%s/include/%s.h", out_path, f.Name))
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	defer h_file.Close()
 
-	var tmpl *template.Template
-	var ok bool
-	if vg.IsPlaceholder {
-		if vg.ParamType == "Int" {
-			tmpl, ok = gt.tmpls["placeholder_h.t"]
-		} else if vg.ParamType == "Array" {
-			tmpl, ok = gt.tmpls["arrayplaceholder_h.t"]
-		}
-	} else {
-		if vg.TableType == "IndexTable" {
-			tmpl, ok = gt.tmpls["fieldgetterptr_h.t"]
-		} else {
-			tmpl, ok = gt.tmpls["fieldgetter_h.t"]
-		}
-	}
-	if ok {
-		if err := tmpl.Execute(h_file, vg); err != nil {
-			panic(err.Error())
-		}
-	} else {
-		panic(fmt.Sprintf("Cannot find .h template for value_getter"))
-	}
+	//var tmpl *template.Template
+	//var ok bool
+	//if f.IsPlaceHolder() {
+	//	if f.ParamType == "Int" {
+	//		tmpl, ok = gt.tmpls["placeholder_h.t"]
+	//	} else if f.ParamType == "Array" {
+	//		tmpl, ok = gt.tmpls["arrayplaceholder_h.t"]
+	//	}
+	//} else {
+	//	if f.TableType == "IndexTable" {
+	//		tmpl, ok = gt.tmpls["fieldgetterptr_h.t"]
+	//	} else {
+	//		tmpl, ok = gt.tmpls["fieldgetter_h.t"]
+	//	}
+	//}
+	//if ok {
+	//	if err := tmpl.Execute(h_file, f); err != nil {
+	//		panic(err.Error())
+	//	}
+	//} else {
+	//	panic(fmt.Sprintf("Cannot find .h template for value_getter"))
+	//}
 }
 
 func (gt *GtableTemplates) generate_project(out_path string, p *Project) error {
@@ -248,8 +251,6 @@ func (gt *GtableTemplates) Generate(out_path string, data interface{}) {
 		gt.generate_indextable(out_path, data.(*Indextable))
 	case *Query:
 		gt.generate_query(out_path, data.(*Query))
-	case *ValueGetter:
-		gt.generate_valuegetter(out_path, data.(*ValueGetter))
 	case *Project:
 		gt.generate_project(out_path, data.(*Project))
 	default:

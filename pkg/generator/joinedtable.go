@@ -1,11 +1,12 @@
 package generator
 
 type JoinedTable struct {
-	Name            string   `xml:"name"`
-	OnColumn        []string `xml:"on_column"`
-	JoinType        string   `xml:"join_type,attr"`
-	ScanLimit       string   `xml:"scan_limit,attr"`
-	EachScanLimit   string   `xml:"each_scan_limit,attr"`
-	ResultLimit     string   `xml:"result_limit,attr"`
-	EachResultLimit string   `xml:"each_result_limit,attr"`
+	Name            string  `xml:"name"`
+	JoinType        string  `xml:"join_type,attr"`
+	LeftOnColumns   []Field `xml:"left_on_columns>field"`
+	RightOnColumns  []Field `xml:"right_on_columns>field"`
+	ScanLimit       Field   `xml:"scan_limit"`
+	EachScanLimit   Field   `xml:"each_scan_limit"`
+	ResultLimit     Field   `xml:"result_limit"`
+	EachResultLimit Field   `xml:"each_result_limit"`
 }

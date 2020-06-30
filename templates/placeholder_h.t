@@ -3,15 +3,15 @@
 #include "valuegetter.h"
 #include "messenger.h"
 
-namespace {{ .Namespace }} {
+namespace {{ .GetNamespace }} {
 
-class {{ .Name -}}_getter: public galois::gtable::placeholder_getter<messenger_t> {
+class {{ .GetName -}}_getter: public galois::gtable::placeholder_getter<messenger_t> {
 public:
-    {{- .Name -}}_getter(): _value(0) {
+    {{- .GetName -}}_getter(): _value(0) {
     }
 
     const char* name() const {
-        return "{{- .Name -}}_getter";
+        return "{{- .GetName -}}_getter";
     }
 
 protected:
@@ -27,13 +27,13 @@ protected:
         } else if (!query_data->params[_param_pos]->is_setted()) {
             FATAL("pos[%d] not setted", _param_pos, param_size);
         } else {
-            _value = static_cast<{{- .FieldType -}}>(query_data->params[_param_pos]->get_value());
+            _value = static_cast<{{- .GetFieldType -}}>(query_data->params[_param_pos]->get_value());
         }
         return &_value;
     }
 
 private:
-    mutable {{ .FieldType }} _value;
+    mutable {{ .GetFieldType }} _value;
 };
 
 }

@@ -406,9 +406,6 @@ func (d *Project) Generate(templates_path string, out_path string) error {
 		for _, qy := range d.Queries {
 			tmps.Generate(out_path, &qy)
 		}
-		for _, vg := range d.ValueGetters {
-			tmps.Generate(out_path, &vg)
-		}
 	}
 	tmps.generate_project(out_path, d)
 	return nil

@@ -5,15 +5,15 @@
 
 namespace {{.Namespace}} {
 
-class {{ .Name -}}_conditioner : public galois::gtable::field_conditioner<{{- .Handler-}}, messenger_t> {
+class {{ .Name -}}_conditioner : public galois::gtable::field_conditioner<{{- .Handler -}}, messenger_t> {
 public:
-    {{- .SomeDefinitions -}
+    {{- .SomeDefinitions -}}
 
     const char* name() const {
         return "{{- .Name -}}";
     }
 
-    bool do_condition(const {{- .Handler-}}& handle, messenger_t* msgr) {
+    bool do_condition(const {{- .Handler -}}& handle, messenger_t* msgr) {
         if (_seek_round_idx == msgr->p_monitor_info->_visited_num) {
             return _last_ret;
         }
